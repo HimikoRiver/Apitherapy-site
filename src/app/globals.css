@@ -24,3 +24,71 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
+
+@keyframes floatGlowOne {
+  0% {
+    transform: translate3d(-8%, -4%, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(10%, 6%, 0) scale(1.12);
+  }
+  100% {
+    transform: translate3d(-8%, -4%, 0) scale(1);
+  }
+}
+
+@keyframes floatGlowTwo {
+  0% {
+    transform: translate3d(10%, 8%, 0) scale(1.05);
+  }
+  50% {
+    transform: translate3d(-12%, -6%, 0) scale(1.18);
+  }
+  100% {
+    transform: translate3d(10%, 8%, 0) scale(1.05);
+  }
+}
+
+.honey-glow {
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  filter: blur(60px);
+  opacity: 0.55;
+}
+
+.honey-glow-1 {
+  background:
+    radial-gradient(circle at 50% 45%,
+      rgba(255, 205, 90, 0.24) 0%,
+      rgba(255, 145, 20, 0.18) 24%,
+      rgba(140, 45, 0, 0.08) 42%,
+      transparent 64%);
+  animation: floatGlowOne 14s ease-in-out infinite;
+}
+
+.honey-glow-2 {
+  background:
+    radial-gradient(circle at 55% 50%,
+      rgba(255, 180, 60, 0.18) 0%,
+      rgba(255, 110, 0, 0.12) 28%,
+      rgba(90, 20, 0, 0.06) 46%,
+      transparent 68%);
+  animation: floatGlowTwo 18s ease-in-out infinite;
+}
+
+.honey-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at center, transparent 38%, rgba(0, 0, 0, 0.22) 72%, rgba(0, 0, 0, 0.78) 100%);
+}
+
+
+
+
+
+
