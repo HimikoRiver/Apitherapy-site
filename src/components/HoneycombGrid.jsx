@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const HEX_SIZE = 52;
 const STROKE = 1.5;
@@ -30,6 +30,7 @@ function clamp(value, min, max) {
 
 export default function HoneycombGrid() {
   const [mouse, setMouse] = useState(null);
+  const containerRef = useRef(null);
 
   const width = Math.sqrt(3) * HEX_SIZE;
   const height = HEX_SIZE * 2;
@@ -66,33 +67,53 @@ export default function HoneycombGrid() {
   const svgWidth = maxX - minX;
   const svgHeight = maxY - minY;
 
-  const handleMouseMove = (e) => {
-    const svg = e.currentTarget;
-    const rect = svg.getBoundingClientRect();
+  useEffect(() => {
+    let frameId = null;
 
-    const px = ((e.clientX - rect.left) / rect.width) * svgWidth + minX;
-    const py = ((e.clientY - rect.top) / rect.height) * svgHeight + minY;
+    const handleMouseMove = (e) => {
+      if (!containerRef.current) return;
 
-    setMouse({ x: px, y: py });
-  };
+      if (frameId) cancelAnimationFrame(frameId);
 
-  const handleMouseLeave = () => {
-    setMouse(null);
-  };
+      frameId = requestAnimationFrame(() => {
+        const rect = containerRef.current.getBoundingClientRect();
+
+        const px = ((e.clientX - rect.left) / rect.width) * svgWidth + minX;
+        const py = ((e.clientY - rect.top) / rect.height) * svgHeight + minY;
+
+        setMouse({ x: px, y: py });
+      });
+    };
+
+    const handleMouseLeaveWindow = () => {
+      setMouse(null);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseout", handleMouseLeaveWindow);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseout", handleMouseLeaveWindow);
+
+      if (frameId) cancelAnimationFrame(frameId);
+    };
+  }, [minX, minY, svgWidth, svgHeight]);
 
   return (
-    <div className="absolute inset-0 z-0 overflow-hidden">
+    <div
+      ref={containerRef}
+      className="absolute inset-0 z-0 overflow-hidden pointer-events-none"
+    >
       <div className="honey-glow honey-glow-1" />
       <div className="honey-glow honey-glow-2" />
       <div className="honey-vignette" />
 
-<svg
-  viewBox={`${minX} ${minY} ${svgWidth} ${svgHeight}`}
-  className="absolute inset-y-0 left-1/2 h-full w-[108%] max-w-none -translate-x-1/2"
-  preserveAspectRatio="xMidYMid slice"
-  onMouseMove={handleMouseMove}
-  onMouseLeave={handleMouseLeave}
->
+      <svg
+        viewBox={`${minX} ${minY} ${svgWidth} ${svgHeight}`}
+        className="absolute inset-y-0 left-1/2 h-full w-[108%] max-w-none -translate-x-1/2"
+        preserveAspectRatio="xMidYMid slice"
+      >
         <defs>
           <linearGradient id="hexStroke" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#4e0c00" />

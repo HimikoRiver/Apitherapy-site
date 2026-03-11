@@ -92,3 +92,152 @@ body {
 
 
 
+.bee-container {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.bee {
+  position: absolute;
+  will-change: transform;
+}
+
+.bee-image {
+  display: block;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.35));
+  user-select: none;
+  pointer-events: none;
+}
+
+/* стартовые позиции */
+
+.bee-a {
+  top: 10%;
+  left: 8%;
+  animation: beeFlightA 14s infinite ease-in-out;
+}
+
+.bee-b {
+  top: 20%;
+  left: 72%;
+  animation: beeFlightB 12s infinite ease-in-out;
+}
+
+.bee-c {
+  top: 56%;
+  left: 12%;
+  animation: beeFlightC 15s infinite ease-in-out;
+}
+
+.bee-d {
+  top: 72%;
+  left: 76%;
+  animation: beeFlightD 13s infinite ease-in-out;
+}
+
+/* плавное "жужжание" */
+
+.bee-a .bee-image,
+.bee-b .bee-image,
+.bee-c .bee-image,
+.bee-d .bee-image {
+  animation: beeFloat 0.9s infinite ease-in-out;
+}
+
+/* траектории */
+
+@keyframes beeFlightA {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  20% {
+    transform: translate(80px, -36px) rotate(6deg);
+  }
+  45% {
+    transform: translate(150px, 12px) rotate(-4deg);
+  }
+  70% {
+    transform: translate(92px, 78px) rotate(5deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+@keyframes beeFlightB {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(-90px, 48px) rotate(-7deg);
+  }
+  50% {
+    transform: translate(-168px, -24px) rotate(5deg);
+  }
+  75% {
+    transform: translate(-58px, -72px) rotate(-4deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+@keyframes beeFlightC {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(74px, -82px) rotate(7deg);
+  }
+  50% {
+    transform: translate(158px, -18px) rotate(-5deg);
+  }
+  75% {
+    transform: translate(64px, 52px) rotate(4deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+@keyframes beeFlightD {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  20% {
+    transform: translate(-72px, -28px) rotate(-5deg);
+  }
+  50% {
+    transform: translate(-146px, 42px) rotate(6deg);
+  }
+  80% {
+    transform: translate(-48px, 68px) rotate(-3deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+@keyframes beeFloat {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    transform: translateY(-2px) scale(1.02);
+  }
+  50% {
+    transform: translateY(0) scale(1);
+  }
+  75% {
+    transform: translateY(2px) scale(0.99);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
