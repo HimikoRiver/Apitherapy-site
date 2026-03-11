@@ -255,20 +255,7 @@ export default function HeroSection() {
               );
             })}
 
-            <a
-              href="#contacts"
-              onClick={handleNavClick}
-              className={`pt-2 text-sm uppercase tracking-[0.28em] transition-all duration-300 ${
-                activeSection === "contacts"
-                  ? "translate-x-[-6px] text-white"
-                  : "translate-x-0 text-[#f2c55c] hover:text-white"
-              }`}
-              style={{
-                transitionDelay: menuOpen ? `${navItems.length * 55}ms` : "0ms",
-              }}
-            >
-              Записаться
-            </a>
+
           </nav>
         </div>
       </div>
