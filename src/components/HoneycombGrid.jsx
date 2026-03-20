@@ -2,11 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-const HEX_SIZE = 52;
-const STROKE = 1.5;
-const ROWS = 20;
-const COLS = 40;
+const HEX_SIZE = 17;
+const STROKE = 1.2;
 const EXTRA_PADDING = 4;
+const INTERACTION_RADIUS_MULTIPLIER = 2.35;
 
 function hexPoints(size) {
   const w = Math.sqrt(3) * size;
@@ -29,8 +28,16 @@ function clamp(value, min, max) {
 }
 
 export default function HoneycombGrid() {
-  const [mouse, setMouse] = useState(null);
   const containerRef = useRef(null);
+  const svgRef = useRef(null);
+  const mouseRef = useRef(null);
+  const rafRef = useRef(null);
+  const polygonRefs = useRef([]);
+  const glowRefs = useRef([]);
+  const fillRefs = useRef([]);
+  const lastActiveSetRef = useRef(new Set());
+
+  const [viewport, setViewport] = useState({ width: 0, height: 0 });
 
   const width = Math.sqrt(3) * HEX_SIZE;
   const height = HEX_SIZE * 2;
@@ -38,12 +45,50 @@ export default function HoneycombGrid() {
   const horizontalStep = width;
   const points = hexPoints(HEX_SIZE);
 
-  const hexagons = useMemo(() => {
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const element = containerRef.current;
+
+    const updateSize = () => {
+      const rect = element.getBoundingClientRect();
+      setViewport({
+        width: rect.width,
+        height: rect.height,
+      });
+    };
+
+    updateSize();
+
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(element);
+    window.addEventListener("resize", updateSize);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updateSize);
+    };
+  }, []);
+
+  const gridMetrics = useMemo(() => {
+    const safeWidth = Math.max(viewport.width, 320);
+    const safeHeight = Math.max(viewport.height, 320);
+
+    const cols =
+      Math.ceil(safeWidth / horizontalStep) + EXTRA_PADDING * 2 + 2;
+    const rows =
+      Math.ceil(safeHeight / verticalStep) + EXTRA_PADDING * 2 + 2;
+
+    const startRow = -EXTRA_PADDING;
+    const endRow = rows - EXTRA_PADDING;
+    const startCol = -EXTRA_PADDING;
+    const endCol = cols - EXTRA_PADDING;
+
     const items = [];
 
-    for (let row = -EXTRA_PADDING; row < ROWS + EXTRA_PADDING; row++) {
-      for (let col = -EXTRA_PADDING; col < COLS + EXTRA_PADDING; col++) {
-        const x = col * horizontalStep + (row % 2 ? width / 2 : 0);
+    for (let row = startRow; row < endRow; row++) {
+      for (let col = startCol; col < endCol; col++) {
+        const x = col * horizontalStep + (Math.abs(row) % 2 ? width / 2 : 0);
         const y = row * verticalStep;
 
         items.push({
@@ -56,49 +101,122 @@ export default function HoneycombGrid() {
       }
     }
 
-    return items;
-  }, [width, height, horizontalStep, verticalStep]);
+    const minX = Math.min(...items.map((h) => h.x)) - width;
+    const maxX = Math.max(...items.map((h) => h.x)) + width * 2;
+    const minY = Math.min(...items.map((h) => h.y)) - height;
+    const maxY = Math.max(...items.map((h) => h.y)) + height * 2;
 
-  const minX = Math.min(...hexagons.map((h) => h.x)) - width;
-  const maxX = Math.max(...hexagons.map((h) => h.x)) + width * 2;
-  const minY = Math.min(...hexagons.map((h) => h.y)) - height;
-  const maxY = Math.max(...hexagons.map((h) => h.y)) + height * 2;
+    const svgWidth = maxX - minX;
+    const svgHeight = maxY - minY;
 
-  const svgWidth = maxX - minX;
-  const svgHeight = maxY - minY;
+    return {
+      items,
+      minX,
+      minY,
+      svgWidth,
+      svgHeight,
+    };
+  }, [viewport.width, viewport.height, width, height, horizontalStep, verticalStep]);
 
   useEffect(() => {
-    let frameId = null;
+    polygonRefs.current = polygonRefs.current.slice(0, gridMetrics.items.length);
+    fillRefs.current = fillRefs.current.slice(0, gridMetrics.items.length);
+    glowRefs.current = glowRefs.current.slice(0, gridMetrics.items.length);
+  }, [gridMetrics.items.length]);
 
-    const handleMouseMove = (e) => {
-      if (!containerRef.current) return;
+  useEffect(() => {
+    const radius = width * INTERACTION_RADIUS_MULTIPLIER;
+    const radiusSq = radius * radius;
 
-      if (frameId) cancelAnimationFrame(frameId);
+    const resetHex = (index) => {
+      const strokeEl = polygonRefs.current[index];
+      const fillEl = fillRefs.current[index];
+      const glowEl = glowRefs.current[index];
 
-      frameId = requestAnimationFrame(() => {
-        const rect = containerRef.current.getBoundingClientRect();
-
-        const px = ((e.clientX - rect.left) / rect.width) * svgWidth + minX;
-        const py = ((e.clientY - rect.top) / rect.height) * svgHeight + minY;
-
-        setMouse({ x: px, y: py });
-      });
+      if (strokeEl) strokeEl.style.opacity = "0.62";
+      if (fillEl) fillEl.style.opacity = "0";
+      if (glowEl) glowEl.style.opacity = "0";
     };
 
-    const handleMouseLeaveWindow = () => {
-      setMouse(null);
+    const animate = () => {
+      const mouse = mouseRef.current;
+      const activeSet = new Set();
+
+      if (mouse) {
+        for (let i = 0; i < gridMetrics.items.length; i++) {
+          const hex = gridMetrics.items[i];
+          const dx = mouse.x - hex.cx;
+          const dy = mouse.y - hex.cy;
+          const distSq = dx * dx + dy * dy;
+
+          if (distSq > radiusSq) continue;
+
+          const dist = Math.sqrt(distSq);
+          let intensity = clamp(1 - dist / radius, 0, 1);
+          intensity = Math.pow(intensity, 1.8);
+
+          const fillOpacity = intensity * 0.82;
+          const glowOpacity = intensity * 0.36;
+          const strokeOpacity = 0.62 + intensity * 0.28;
+
+          const strokeEl = polygonRefs.current[i];
+          const fillEl = fillRefs.current[i];
+          const glowEl = glowRefs.current[i];
+
+          if (strokeEl) strokeEl.style.opacity = String(strokeOpacity);
+          if (fillEl) fillEl.style.opacity = String(fillOpacity);
+          if (glowEl) glowEl.style.opacity = String(glowOpacity);
+
+          activeSet.add(i);
+        }
+      }
+
+      for (const index of lastActiveSetRef.current) {
+        if (!activeSet.has(index)) {
+          resetHex(index);
+        }
+      }
+
+      lastActiveSetRef.current = activeSet;
+      rafRef.current = requestAnimationFrame(animate);
+    };
+
+    rafRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [gridMetrics.items, width]);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!svgRef.current) return;
+
+      const rect = svgRef.current.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+
+      const px =
+        ((e.clientX - rect.left) / rect.width) * gridMetrics.svgWidth +
+        gridMetrics.minX;
+      const py =
+        ((e.clientY - rect.top) / rect.height) * gridMetrics.svgHeight +
+        gridMetrics.minY;
+
+      mouseRef.current = { x: px, y: py };
+    };
+
+    const handleMouseLeave = () => {
+      mouseRef.current = null;
     };
 
     window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseout", handleMouseLeaveWindow);
+    window.addEventListener("blur", handleMouseLeave);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseout", handleMouseLeaveWindow);
-
-      if (frameId) cancelAnimationFrame(frameId);
+      window.removeEventListener("blur", handleMouseLeave);
     };
-  }, [minX, minY, svgWidth, svgHeight]);
+  }, [gridMetrics.minX, gridMetrics.minY, gridMetrics.svgWidth, gridMetrics.svgHeight]);
 
   return (
     <div
@@ -110,9 +228,16 @@ export default function HoneycombGrid() {
       <div className="honey-vignette" />
 
       <svg
-        viewBox={`${minX} ${minY} ${svgWidth} ${svgHeight}`}
-        className="absolute inset-y-0 left-1/2 h-full w-[108%] max-w-none -translate-x-1/2"
-        preserveAspectRatio="xMidYMid slice"
+        ref={svgRef}
+        viewBox={`${gridMetrics.minX} ${gridMetrics.minY} ${gridMetrics.svgWidth} ${gridMetrics.svgHeight}`}
+        width={gridMetrics.svgWidth}
+        height={gridMetrics.svgHeight}
+        className="absolute left-1/2 top-1/2 max-w-none -translate-x-1/2 -translate-y-1/2"
+        style={{
+          width: `${gridMetrics.svgWidth}px`,
+          height: `${gridMetrics.svgHeight}px`,
+        }}
+        preserveAspectRatio="xMidYMid meet"
       >
         <defs>
           <linearGradient id="hexStroke" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -122,14 +247,14 @@ export default function HoneycombGrid() {
           </linearGradient>
 
           <radialGradient id="honeyFill" cx="50%" cy="40%" r="72%">
-            <stop offset="0%" stopColor="rgba(255,240,170,0.98)" />
-            <stop offset="28%" stopColor="rgba(255,204,95,0.95)" />
-            <stop offset="58%" stopColor="rgba(227,132,24,0.78)" />
-            <stop offset="100%" stopColor="rgba(105,40,0,0.16)" />
+            <stop offset="0%" stopColor="rgba(255,240,170,0.96)" />
+            <stop offset="28%" stopColor="rgba(255,204,95,0.9)" />
+            <stop offset="58%" stopColor="rgba(227,132,24,0.6)" />
+            <stop offset="100%" stopColor="rgba(105,40,0,0.1)" />
           </radialGradient>
 
-          <filter id="glow" x="-90%" y="-90%" width="280%" height="280%">
-            <feGaussianBlur stdDeviation="6.5" result="blur" />
+          <filter id="glow" x="-70%" y="-70%" width="240%" height="240%">
+            <feGaussianBlur stdDeviation="2.4" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
@@ -137,58 +262,49 @@ export default function HoneycombGrid() {
           </filter>
         </defs>
 
-        {hexagons.map((hex) => {
-          let intensity = 0;
+        {gridMetrics.items.map((hex, index) => (
+          <g key={hex.id} transform={`translate(${hex.x}, ${hex.y})`}>
+            <polygon
+              ref={(el) => {
+                polygonRefs.current[index] = el;
+              }}
+              points={points}
+              fill="rgba(255,255,255,0.004)"
+              stroke="url(#hexStroke)"
+              strokeWidth={STROKE}
+              opacity="0.62"
+              vectorEffect="non-scaling-stroke"
+              style={{
+                transition: "opacity 140ms ease-out",
+              }}
+            />
 
-          if (mouse) {
-            const dx = mouse.x - hex.cx;
-            const dy = mouse.y - hex.cy;
-            const dist = Math.hypot(dx, dy);
+            <polygon
+              ref={(el) => {
+                fillRefs.current[index] = el;
+              }}
+              points={points}
+              fill="url(#honeyFill)"
+              opacity="0"
+              style={{
+                transition: "opacity 140ms ease-out",
+              }}
+            />
 
-            const radius = width * 2.15;
-            intensity = clamp(1 - dist / radius, 0, 1);
-            intensity = Math.pow(intensity, 1.8);
-          }
-
-          const fillOpacity = intensity * 0.88;
-          const glowOpacity = intensity * 0.72;
-          const strokeOpacity = 0.62 + intensity * 0.34;
-
-          return (
-            <g key={hex.id} transform={`translate(${hex.x}, ${hex.y})`}>
-              <polygon
-                points={points}
-                fill="rgba(255,255,255,0.006)"
-                stroke="url(#hexStroke)"
-                strokeWidth={STROKE}
-                opacity={strokeOpacity}
-                style={{
-                  transition:
-                    "opacity 180ms ease-out, fill 180ms ease-out, stroke 180ms ease-out",
-                }}
-              />
-
-              <polygon
-                points={points}
-                fill="url(#honeyFill)"
-                opacity={fillOpacity}
-                style={{
-                  transition: "opacity 220ms ease-out",
-                }}
-              />
-
-              <polygon
-                points={points}
-                fill="url(#honeyFill)"
-                opacity={glowOpacity}
-                filter="url(#glow)"
-                style={{
-                  transition: "opacity 280ms ease-out",
-                }}
-              />
-            </g>
-          );
-        })}
+            <polygon
+              ref={(el) => {
+                glowRefs.current[index] = el;
+              }}
+              points={points}
+              fill="url(#honeyFill)"
+              opacity="0"
+              filter="url(#glow)"
+              style={{
+                transition: "opacity 180ms ease-out",
+              }}
+            />
+          </g>
+        ))}
       </svg>
     </div>
   );
