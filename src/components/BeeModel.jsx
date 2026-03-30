@@ -11,7 +11,7 @@ import { Suspense, useEffect, useRef } from "react";
 
 function Bee() {
   const groupRef = useRef();
-  const { scene, animations } = useGLTF("/models/bee.glb");
+  const { scene, animations } = useGLTF("/models/bee-optimized.glb");
   const { actions } = useAnimations(animations, groupRef);
 
   useEffect(() => {
@@ -35,7 +35,6 @@ function Bee() {
 
     const t = state.clock.getElapsedTime();
 
-    // Пчела летает значительно ниже
     groupRef.current.position.y = Math.sin(t * 1.8) * 0.04 - 0.42;
     groupRef.current.position.x = Math.cos(t * 0.9) * 0.06;
     groupRef.current.rotation.z = Math.sin(t * 1.15) * 0.05;
@@ -53,12 +52,16 @@ function Bee() {
   );
 }
 
-useGLTF.preload("/models/bee.glb");
+useGLTF.preload("/models/bee-optimized.glb");
 
-export default function BeeModel() {
+export default function BeeModel({ interactive = true }) {
   return (
-    <div className="h-full w-full overflow-visible">
-      <Canvas gl={{ antialias: true, alpha: true }} dpr={[1, 2]}>
+    <div className="h-full w-full overflow-visible touch-pan-y">
+      <Canvas
+        gl={{ antialias: true, alpha: true }}
+        dpr={[1, 1.5]}
+        shadows={false}
+      >
         <Suspense fallback={null}>
           <PerspectiveCamera makeDefault position={[0, 0.15, 6.8]} fov={30} />
 
@@ -71,6 +74,8 @@ export default function BeeModel() {
           <Bee />
 
           <OrbitControls
+            enabled={interactive}
+            enableRotate={interactive}
             enableZoom={false}
             enablePan={false}
             autoRotate
