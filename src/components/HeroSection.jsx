@@ -273,7 +273,7 @@ export default function HeroSection() {
         height={800}
         priority
         sizes="320px"
-        className="pointer-events-none absolute left-0 -top-5 z-30 w-[320px] select-none"
+        className="pointer-events-none absolute left-0 -top-5 z-30 w-[250px] min-[391px]:w-[320px] select-none"
         style={styles.honey}
       />
 
@@ -293,19 +293,19 @@ export default function HeroSection() {
 
       <div className="relative z-20 flex h-[clamp(680px,100svh,980px)] items-center px-6 py-20">
         <div className="mx-auto w-full max-w-[1500px]">
-          <div className="grid w-full grid-cols-1 items-center gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
+          <div className="grid w-full grid-cols-1 items-center gap-8 min-[1181px]:grid-cols-[1.05fr_0.95fr] min-[1181px]:gap-10">
             <div
-              className="relative z-20 flex justify-center lg:justify-start"
+              className="relative z-20 flex justify-center min-[1181px]:justify-start"
               style={styles.textWrap}
             >
-              <div className="flex w-full max-w-5xl flex-col text-center lg:max-w-[820px] lg:pl-8 lg:text-left xl:pl-16">
-                <div className="order-2 md:order-1 md:translate-y-30">
+              <div className="flex w-full max-w-5xl flex-col text-center min-[1181px]:max-w-[820px] min-[1181px]:pl-8 min-[1181px]:text-left xl:pl-16">
+                <div className="order-2 md:order-1 md:-translate-y-[13px] md:max-[1180px]:translate-y-[67px] min-[1181px]:-translate-y-[13px]">
                   <div
-                    className="mx-auto mb-6 h-24 w-24 rounded-full bg-[radial-gradient(circle,rgba(255,209,92,0.42),rgba(255,160,30,0.1),transparent_72%)] blur-2xl lg:mx-0 md:mb-8 md:h-32 md:w-32"
+                    className="mx-auto mb-6 h-24 w-24 rounded-full bg-[radial-gradient(circle,rgba(255,209,92,0.42),rgba(255,160,30,0.1),transparent_72%)] blur-2xl md:mb-8 md:h-32 md:w-32 min-[1181px]:mx-0"
                     style={styles.glow}
                   />
-
-                  <div className="relative z-10 -mt-10 sm:-mt-12 md:-mt-36 lg:mt-10 xl:mt-14">
+<div className="relative z-10 -mt-36 min-[391px]:-mt-10 sm:-mt-12 md:-mt-36 md:max-[1180px]:-mt-16 min-[1181px]:mt-10 xl:mt-14">
+                  
                     <p
                       className="mb-4 text-xs uppercase tracking-[0.45em] text-amber-200/80 md:mb-6 md:text-sm"
                       style={styles.badge}
@@ -314,17 +314,23 @@ export default function HeroSection() {
                     </p>
 
                     <h1
-                      className="text-5xl font-semibold uppercase leading-[0.9] tracking-[0.04em] text-white md:text-7xl lg:text-[108px] xl:text-[120px]"
+                      className="text-[58px] min-[391px]:text-5xl font-semibold uppercase leading-[0.9] tracking-[0.04em] text-white md:text-7xl min-[1181px]:text-[108px] xl:text-[120px]"
                       style={styles.title}
                     >
                       <span className="block">Dr.</span>
-                      <span className="block bg-gradient-to-b from-white via-[#fff3d6] to-[#f2c55c] bg-clip-text text-transparent">
-                        Pchelka
-                      </span>
+                      <span
+  className="block bg-gradient-to-b from-white via-[#fff3d6] to-[#f2c55c] bg-clip-text text-transparent"
+  style={{
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+  }}
+>
+  Pchelka
+</span>
                     </h1>
 
                     <div
-                      className="mx-auto mt-3 inline-flex max-w-[320px] flex-col items-center rounded-2xl border border-white/16 bg-black/72 px-5 py-3 shadow-[0_12px_36px_rgba(0,0,0,0.34)] backdrop-blur-xl lg:hidden md:mt-4 md:max-w-[380px] md:px-6 md:py-4"
+                      className="mx-auto mt-3 inline-flex max-w-[320px] flex-col items-center rounded-2xl border border-white/16 bg-black/72 px-5 py-3 shadow-[0_12px_36px_rgba(0,0,0,0.34)] backdrop-blur-xl md:mt-4 md:max-w-[380px] md:px-6 md:py-4 min-[1181px]:hidden"
                       style={styles.subtitle}
                     >
                       <p className="text-sm font-medium uppercase tracking-[0.28em] text-white/95 md:text-lg">
@@ -336,12 +342,12 @@ export default function HeroSection() {
                       </p>
                     </div>
 
-                    <p className="hidden mt-3 text-sm font-medium uppercase tracking-[0.28em] text-white/85 lg:block lg:text-[22px]">
+                    <p className="hidden mt-3 text-sm font-medium uppercase tracking-[0.28em] text-white/85 min-[1181px]:block min-[1181px]:text-[22px]">
                       Амина Мазаева
                     </p>
 
                     <p
-                      className="hidden mx-auto mt-5 max-w-xl text-xs uppercase tracking-[0.35em] text-white/80 lg:mx-0 md:mt-8 md:text-sm lg:block"
+                      className="hidden mx-auto mt-2 max-w-xl text-xs uppercase tracking-[0.35em] text-white/80 min-[1181px]:mx-0 min-[1181px]:block md:text-sm"
                       style={styles.subtitle}
                     >
                       лечение пчелиным ядом
@@ -349,7 +355,7 @@ export default function HeroSection() {
                   </div>
                 </div>
 
-                <div className="order-1 mb-5 md:order-2 md:mb-7 lg:hidden">
+                <div className="order-1 mb-5 md:order-2 md:mb-7 md:max-[1180px]:translate-y-[80px] min-[1181px]:hidden">
                   <div
                     className="relative pointer-events-auto mx-auto h-[280px] w-full max-w-[420px] sm:h-[360px] sm:max-w-[560px] md:h-[500px] md:max-w-[760px]"
                     style={styles.mobileBeeWrap}
@@ -369,7 +375,7 @@ export default function HeroSection() {
               </div>
             </div>
 
-            <div className="relative hidden min-h-[620px] overflow-visible lg:block">
+            <div className="relative hidden min-h-[620px] overflow-visible min-[1181px]:block">
               <div
                 className="pointer-events-none absolute inset-0 overflow-visible"
                 style={styles.beeGlow}
