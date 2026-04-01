@@ -23,6 +23,8 @@ function easeOutCubic(t) {
 export default function HeroSection() {
   const heroRef = useRef(null);
   const lastProgressRef = useRef(0);
+  const isAtTopRef = useRef(true);
+  const activeSectionRef = useRef("hero-track");
 
   const [progress, setProgress] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -34,19 +36,7 @@ export default function HeroSection() {
   const [isMobileViewport, setIsMobileViewport] = useState(false);
 
   useEffect(() => {
-    const threshold = window.innerHeight * 1.2;
-
-    const handleBeeVisibility = () => {
-      if (window.scrollY < threshold) {
-        setShowBee(true);
-        window.removeEventListener("scroll", handleBeeVisibility);
-      }
-    };
-
-    handleBeeVisibility();
-    window.addEventListener("scroll", handleBeeVisibility, { passive: true });
-
-    return () => window.removeEventListener("scroll", handleBeeVisibility);
+    setShowBee(true);
   }, []);
 
   useEffect(() => {
@@ -116,7 +106,12 @@ export default function HeroSection() {
         setProgress(raw);
 
         const scrollY = window.scrollY;
-        setIsAtTop(scrollY <= 10);
+        const nextIsAtTop = scrollY <= 10;
+
+        if (nextIsAtTop !== isAtTopRef.current) {
+          isAtTopRef.current = nextIsAtTop;
+          setIsAtTop(nextIsAtTop);
+        }
 
         const sectionIds = [
           "hero-track",
@@ -142,7 +137,11 @@ export default function HeroSection() {
           }
         }
 
-        setActiveSection(current);
+        if (current !== activeSectionRef.current) {
+          activeSectionRef.current = current;
+          setActiveSection(current);
+        }
+
         ticking = false;
       });
     };
@@ -272,7 +271,7 @@ export default function HeroSection() {
         width={900}
         height={800}
         priority
-        sizes="320px"
+        sizes="(max-width: 390px) 250px, 320px"
         className="pointer-events-none absolute left-0 -top-5 z-30 w-[250px] min-[391px]:w-[320px] select-none"
         style={styles.honey}
       />
@@ -304,8 +303,8 @@ export default function HeroSection() {
                     className="mx-auto mb-6 h-24 w-24 rounded-full bg-[radial-gradient(circle,rgba(255,209,92,0.42),rgba(255,160,30,0.1),transparent_72%)] blur-2xl md:mb-8 md:h-32 md:w-32 min-[1181px]:mx-0"
                     style={styles.glow}
                   />
-<div className="relative z-10 -mt-36 min-[391px]:-mt-10 sm:-mt-12 md:-mt-36 md:max-[1180px]:-mt-16 min-[1181px]:mt-10 xl:mt-14">
-                  
+
+                  <div className="relative z-10 -mt-36 min-[391px]:-mt-10 sm:-mt-12 md:-mt-36 md:max-[1180px]:-mt-16 min-[1181px]:mt-10 xl:mt-14">
                     <p
                       className="mb-4 text-xs uppercase tracking-[0.45em] text-amber-200/80 md:mb-6 md:text-sm"
                       style={styles.badge}
@@ -319,14 +318,14 @@ export default function HeroSection() {
                     >
                       <span className="block">Dr.</span>
                       <span
-  className="block bg-gradient-to-b from-white via-[#fff3d6] to-[#f2c55c] bg-clip-text text-transparent"
-  style={{
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
-  }}
->
-  Pchelka
-</span>
+                        className="block bg-gradient-to-b from-white via-[#fff3d6] to-[#f2c55c] bg-clip-text text-transparent"
+                        style={{
+                          WebkitBackgroundClip: "text",
+                          WebkitTextFillColor: "transparent",
+                        }}
+                      >
+                        Pchelka
+                      </span>
                     </h1>
 
                     <div
