@@ -76,23 +76,25 @@ const accordionItems = [
 export default function ServicesSection() {
   const [openIndex, setOpenIndex] = useState(0);
 
+  const handleAccordionToggle = (index) => {
+    setOpenIndex((prev) => (prev === index ? -1 : index));
+  };
+
   return (
     <section
       id="services"
       className="relative overflow-hidden border-t border-white/5 bg-black px-4 py-16 text-white sm:px-6 lg:px-8"
     >
       <div className="relative z-10 mx-auto max-w-6xl">
-
         {/* верхний блок с цветами */}
         <div className="grid items-center gap-8 lg:grid-cols-[1.05fr_1fr]">
-
           <div className="relative h-[320px] sm:h-[380px] lg:h-[460px]">
             <Image
-              src="/img/flowers.png"
-              alt="flowers"
+              src="/img/flowers.webp"
+              alt="Цветочная композиция"
               fill
-              priority
               className="object-contain"
+              sizes="(max-width: 639px) 100vw, (max-width: 1023px) 70vw, 560px"
             />
 
             {/* летающие пчёлы */}
@@ -127,27 +129,29 @@ export default function ServicesSection() {
 
             return (
               <div key={card.title} className="group relative">
-                <article className="relative h-full overflow-hidden rounded-[28px] border border-white/10 bg-[#0b0b10]/90 p-6 shadow-[0_10px_40px_rgba(0,0,0,0.28)] transition-all duration-500 ease-out will-change-transform group-hover:-translate-y-2 group-hover:rotate-x-6 group-hover:border-amber-200/25 group-hover:shadow-[0_20px_60px_rgba(0,0,0,0.45)] [transform-style:preserve-3d]">
-
+                <article className="relative h-full overflow-hidden rounded-[28px] border border-white/10 bg-[#0b0b10]/90 p-6 shadow-[0_10px_40px_rgba(0,0,0,0.28)] transition-all duration-500 ease-out group-hover:-translate-y-2 group-hover:rotate-x-6 group-hover:border-amber-200/25 group-hover:shadow-[0_20px_60px_rgba(0,0,0,0.45)] [transform-style:preserve-3d]">
                   <div className="pointer-events-none absolute inset-0 rounded-[28px] bg-gradient-to-br from-amber-200/[0.06] via-transparent to-violet-400/[0.04] opacity-80" />
                   <div className="pointer-events-none absolute -left-1/3 top-0 h-full w-1/2 -translate-x-full skew-x-[-22deg] bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 transition-all duration-700 group-hover:translate-x-[260%] group-hover:opacity-100" />
 
                   <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-amber-300/10 blur-3xl transition duration-500 group-hover:bg-amber-300/15" />
                   <div className="pointer-events-none absolute -left-8 bottom-0 h-24 w-24 rounded-full bg-violet-400/8 blur-3xl transition duration-500 group-hover:bg-violet-400/12" />
 
-                  <div className="relative z-10 flex items-center gap-3">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[18px] border border-amber-200/15 bg-[#1a1510]/80 text-[#d6b25e] shadow-[0_10px_24px_rgba(0,0,0,0.18)]">
-                      <Icon className="h-5 w-5 shrink-0 text-[#d6b25e]" />
-                    </div>
+<div className="relative z-10 mx-auto w-full max-w-[240px] sm:mx-0 sm:max-w-none">
+  <div className="flex items-center gap-3">
+    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[18px] border border-amber-200/15 bg-[#1a1510]/80 text-[#d6b25e] shadow-[0_10px_24px_rgba(0,0,0,0.18)]">
+      <Icon className="h-5 w-5 shrink-0 text-[#d6b25e]" />
+    </div>
 
-                    <h3 className="text-[18px] font-semibold leading-tight text-white sm:text-[20px]">
-                      {card.title}
-                    </h3>
-                  </div>
+    <h3 className="text-[18px] font-semibold leading-[1.5] text-white sm:text-[20px] sm:leading-tight">
+      {card.title}
+    </h3>
+  </div>
 
-                  <p className="relative z-10 mt-5 whitespace-pre-line text-[15px] leading-8 text-white/80">
-                    {card.text}
-                  </p>
+  <p className="mt-5 whitespace-pre-line text-[15px] leading-8 text-white/80">
+    {card.text}
+  </p>
+</div>
+
                 </article>
               </div>
             );
@@ -156,7 +160,6 @@ export default function ServicesSection() {
 
         {/* аккордеон состояний */}
         <div className="mt-10 rounded-[28px] border border-amber-200/10 bg-[#110d0b]/88 p-4 sm:p-5 lg:p-6">
-
           <div className="mb-5">
             <p className="text-xs uppercase tracking-[0.32em] text-amber-200/60 sm:text-sm">
               Направления работы
@@ -170,6 +173,8 @@ export default function ServicesSection() {
           <div className="space-y-3">
             {accordionItems.map((item, index) => {
               const isOpen = openIndex === index;
+              const contentId = `services-accordion-content-${index}`;
+              const buttonId = `services-accordion-button-${index}`;
 
               return (
                 <div
@@ -177,8 +182,11 @@ export default function ServicesSection() {
                   className="overflow-hidden rounded-[20px] border border-amber-200/10 bg-[rgba(255,249,239,0.96)] text-zinc-900"
                 >
                   <button
+                    id={buttonId}
                     type="button"
-                    onClick={() => setOpenIndex(isOpen ? -1 : index)}
+                    aria-expanded={isOpen}
+                    aria-controls={contentId}
+                    onClick={() => handleAccordionToggle(index)}
                     className="flex w-full items-center justify-between gap-4 px-4 py-4 text-left sm:px-5"
                   >
                     <span className="text-[15px] font-semibold sm:text-base">
@@ -187,27 +195,29 @@ export default function ServicesSection() {
 
                     <ChevronDown
                       size={18}
-                      className={`transition-transform ${
+                      className={`shrink-0 transition-transform ${
                         isOpen ? "rotate-180" : ""
                       }`}
                     />
                   </button>
 
                   {isOpen && (
-                    <div className="border-t border-zinc-900/10 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
+                    <div
+                      id={contentId}
+                      role="region"
+                      aria-labelledby={buttonId}
+                      className="border-t border-zinc-900/10 px-4 pb-4 pt-3 sm:px-5 sm:pb-5"
+                    >
                       <p className="text-sm leading-7 text-zinc-700">
                         {item.text}
                       </p>
                     </div>
                   )}
-
                 </div>
               );
             })}
           </div>
-
         </div>
-
       </div>
     </section>
   );

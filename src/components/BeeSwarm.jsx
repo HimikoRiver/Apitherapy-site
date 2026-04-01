@@ -48,22 +48,19 @@ const bees = [
 export default function BeeSwarm() {
   return (
     <div
-      style={{
-        position: "absolute",
-        inset: 0,
-        zIndex: 50,
-        pointerEvents: "none",
-      }}
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 z-50"
     >
       {bees.map((bee) => (
         <motion.div
           key={bee.id}
+          className="absolute"
           style={{
-            position: "absolute",
             top: bee.top,
             left: bee.left,
-            width: bee.size,
-            height: bee.size,
+            width: `${bee.size}px`,
+            height: `${bee.size}px`,
+            willChange: "transform",
           }}
           animate={{
             x: bee.x,
@@ -77,15 +74,13 @@ export default function BeeSwarm() {
           }}
         >
           <motion.img
-            src="/img/bee1.png"
+            src="/img/bee1.webp"
             alt=""
             draggable={false}
+            className="block h-full w-full object-contain select-none"
             style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "contain",
-              display: "block",
               filter: "drop-shadow(0 8px 12px rgba(0,0,0,0.35))",
+              willChange: "transform",
             }}
             animate={{
               y: [0, -2, 0, 2, 0],
@@ -94,6 +89,7 @@ export default function BeeSwarm() {
             transition={{
               duration: 0.8,
               repeat: Infinity,
+              ease: "easeInOut",
             }}
           />
         </motion.div>
