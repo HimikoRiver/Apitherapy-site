@@ -7,6 +7,7 @@ const STROKE = 1.15;
 const EXTRA_PADDING = 4;
 const INTERACTION_RADIUS_MULTIPLIER = 2.5;
 const DESKTOP_BREAKPOINT = 1280;
+const MAX_DPR = 1.5;
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -168,13 +169,16 @@ function drawHoneyInside(ctx, cx, cy, size, level, time, phase) {
 export default function HoneycombGridCanvas({ interactive = true }) {
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
+
   const frameRef = useRef(null);
+  const resizeRafRef = useRef(null);
   const layoutRef = useRef(null);
   const baseCanvasRef = useRef(null);
-  const resizeRafRef = useRef(null);
 
   const interactiveRef = useRef(interactive);
   const isDesktopRef = useRef(true);
+  const reducedMotionRef = useRef(false);
+  const isPageVisibleRef = useRef(true);
 
   const pointerRef = useRef({
     clientX: null,
@@ -185,16 +189,31 @@ export default function HoneycombGridCanvas({ interactive = true }) {
   });
 
   useEffect(() => {
+    interactiveRef.current = interactive;
+  }, [interactive]);
+
+  useEffect(() => {
     const container = containerRef.current;
     const canvas = canvasRef.current;
 
     if (!container || !canvas) return;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { alpha: true });
     if (!ctx) return;
 
+    const mediaQuery =
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function"
+        ? window.matchMedia("(prefers-reduced-motion: reduce)")
+        : null;
+
     const getInteractiveState = () => {
-      return interactiveRef.current && isDesktopRef.current;
+      return (
+        interactiveRef.current &&
+        isDesktopRef.current &&
+        !reducedMotionRef.current &&
+        isPageVisibleRef.current
+      );
     };
 
     const buildLayout = (cssWidth, cssHeight) => {
@@ -217,9 +236,10 @@ export default function HoneycombGridCanvas({ interactive = true }) {
 
       for (let row = startRow; row < endRow; row++) {
         for (let col = startCol; col < endCol; col++) {
+          const isOddRow = row % 2 !== 0;
           const cx =
             col * horizontalStep +
-            (Math.abs(row) % 2 ? hexWidth / 2 : 0) +
+            (isOddRow ? hexWidth / 2 : 0) +
             hexWidth / 2;
           const cy = row * verticalStep + hexHeight / 2;
 
@@ -239,8 +259,6 @@ export default function HoneycombGridCanvas({ interactive = true }) {
         cssHeight,
         hexWidth,
         hexHeight,
-        horizontalStep,
-        verticalStep,
         items,
       };
     };
@@ -255,7 +273,7 @@ export default function HoneycombGridCanvas({ interactive = true }) {
       baseCanvas.width = Math.max(1, Math.round(cssWidth));
       baseCanvas.height = Math.max(1, Math.round(cssHeight));
 
-      const baseCtx = baseCanvas.getContext("2d");
+      const baseCtx = baseCanvas.getContext("2d", { alpha: true });
       if (!baseCtx) return;
 
       baseCtx.clearRect(0, 0, cssWidth, cssHeight);
@@ -323,6 +341,14 @@ export default function HoneycombGridCanvas({ interactive = true }) {
       const rect = containerRef.current.getBoundingClientRect();
       pointerRef.current.x = pointerRef.current.clientX - rect.left;
       pointerRef.current.y = pointerRef.current.clientY - rect.top;
+    };
+
+    const resetPointer = () => {
+      pointerRef.current.active = false;
+      pointerRef.current.x = null;
+      pointerRef.current.y = null;
+      pointerRef.current.clientX = null;
+      pointerRef.current.clientY = null;
     };
 
     const resetLevels = () => {
@@ -430,7 +456,7 @@ export default function HoneycombGridCanvas({ interactive = true }) {
     };
 
     const scheduleDraw = () => {
-      if (frameRef.current) return;
+      if (frameRef.current || !isPageVisibleRef.current) return;
       frameRef.current = requestAnimationFrame(draw);
     };
 
@@ -441,17 +467,24 @@ export default function HoneycombGridCanvas({ interactive = true }) {
       isDesktopRef.current = nextIsDesktop;
 
       if (!nextIsDesktop) {
-        pointerRef.current.active = false;
-        pointerRef.current.x = null;
-        pointerRef.current.y = null;
-        pointerRef.current.clientX = null;
-        pointerRef.current.clientY = null;
+        resetPointer();
         resetLevels();
       }
 
       if (modeChanged) {
         scheduleDraw();
       }
+    };
+
+    const updateReducedMotion = () => {
+      reducedMotionRef.current = Boolean(mediaQuery?.matches);
+
+      if (reducedMotionRef.current) {
+        resetPointer();
+        resetLevels();
+      }
+
+      scheduleDraw();
     };
 
     const resize = () => {
@@ -461,10 +494,10 @@ export default function HoneycombGridCanvas({ interactive = true }) {
 
       if (cssWidth < 20 || cssHeight < 20) return;
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
 
-      canvas.width = Math.round(cssWidth * dpr);
-      canvas.height = Math.round(cssHeight * dpr);
+      canvas.width = Math.max(1, Math.round(cssWidth * dpr));
+      canvas.height = Math.max(1, Math.round(cssHeight * dpr));
       canvas.style.width = `${cssWidth}px`;
       canvas.style.height = `${cssHeight}px`;
 
@@ -489,50 +522,106 @@ export default function HoneycombGridCanvas({ interactive = true }) {
     const handlePointerMove = (event) => {
       if (!getInteractiveState()) return;
 
-      pointerRef.current.clientX = event.clientX;
-      pointerRef.current.clientY = event.clientY;
+      const nextClientX = event.clientX;
+      const nextClientY = event.clientY;
+
+      if (
+        pointerRef.current.clientX === nextClientX &&
+        pointerRef.current.clientY === nextClientY &&
+        pointerRef.current.active
+      ) {
+        return;
+      }
+
+      pointerRef.current.clientX = nextClientX;
+      pointerRef.current.clientY = nextClientY;
       pointerRef.current.active = true;
 
       updatePointerLocalPosition();
       scheduleDraw();
     };
 
-    const handlePointerLeave = () => {
-      if (!getInteractiveState()) return;
+    const handlePointerEnd = () => {
+      if (!pointerRef.current.active) return;
 
       pointerRef.current.active = false;
       scheduleDraw();
     };
 
     const handleScroll = () => {
-      if (!getInteractiveState()) return;
+      if (!getInteractiveState() || !pointerRef.current.active) return;
 
       updatePointerLocalPosition();
       scheduleDraw();
     };
 
-    interactiveRef.current = interactive;
+    const handleVisibilityChange = () => {
+      isPageVisibleRef.current = document.visibilityState !== "hidden";
+
+      if (!isPageVisibleRef.current) {
+        if (frameRef.current) {
+          cancelAnimationFrame(frameRef.current);
+          frameRef.current = null;
+        }
+        return;
+      }
+
+      scheduleDraw();
+    };
+
     updateDeviceMode();
+    updateReducedMotion();
     resize();
 
-    const observer = new ResizeObserver(requestResize);
-    observer.observe(container);
+    let resizeObserver = null;
 
-    window.addEventListener("resize", requestResize);
-    window.addEventListener("orientationchange", requestResize);
+    if (typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(requestResize);
+      resizeObserver.observe(container);
+    }
+
+    window.addEventListener("resize", requestResize, { passive: true });
+    window.addEventListener("orientationchange", requestResize, {
+      passive: true,
+    });
     window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("pointermove", handlePointerMove, {
       passive: true,
     });
-    window.addEventListener("blur", handlePointerLeave);
+    window.addEventListener("pointerup", handlePointerEnd, { passive: true });
+    window.addEventListener("pointercancel", handlePointerEnd, {
+      passive: true,
+    });
+    window.addEventListener("blur", handlePointerEnd);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    if (mediaQuery) {
+      if (typeof mediaQuery.addEventListener === "function") {
+        mediaQuery.addEventListener("change", updateReducedMotion);
+      } else if (typeof mediaQuery.addListener === "function") {
+        mediaQuery.addListener(updateReducedMotion);
+      }
+    }
 
     return () => {
-      observer.disconnect();
+      resizeObserver?.disconnect();
+
       window.removeEventListener("resize", requestResize);
       window.removeEventListener("orientationchange", requestResize);
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("blur", handlePointerLeave);
+      window.removeEventListener("pointerup", handlePointerEnd);
+      window.removeEventListener("pointercancel", handlePointerEnd);
+      window.removeEventListener("blur", handlePointerEnd);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+
+      if (mediaQuery) {
+        if (typeof mediaQuery.removeEventListener === "function") {
+          mediaQuery.removeEventListener("change", updateReducedMotion);
+        } else if (typeof mediaQuery.removeListener === "function") {
+          mediaQuery.removeListener(updateReducedMotion);
+        }
+      }
 
       if (frameRef.current) {
         cancelAnimationFrame(frameRef.current);
@@ -544,18 +633,15 @@ export default function HoneycombGridCanvas({ interactive = true }) {
         resizeRafRef.current = null;
       }
     };
-  }, [interactive]);
+  }, []);
 
   return (
     <div
       ref={containerRef}
       className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+      aria-hidden="true"
     >
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 h-full w-full"
-        aria-hidden="true"
-      />
+      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
     </div>
   );
 }
