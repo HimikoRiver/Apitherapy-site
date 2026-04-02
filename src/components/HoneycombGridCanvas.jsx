@@ -6,6 +6,7 @@ const HEX_SIZE = 17;
 const STROKE = 1.15;
 const EXTRA_PADDING = 4;
 const INTERACTION_RADIUS_MULTIPLIER = 2.5;
+const DESKTOP_BREAKPOINT = 1280;
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
@@ -170,8 +171,11 @@ export default function HoneycombGridCanvas({ interactive = true }) {
   const frameRef = useRef(null);
   const layoutRef = useRef(null);
   const baseCanvasRef = useRef(null);
-  const interactiveRef = useRef(interactive);
   const resizeRafRef = useRef(null);
+
+  const interactiveRef = useRef(interactive);
+  const isDesktopRef = useRef(true);
+
   const pointerRef = useRef({
     clientX: null,
     clientY: null,
@@ -181,41 +185,17 @@ export default function HoneycombGridCanvas({ interactive = true }) {
   });
 
   useEffect(() => {
-    interactiveRef.current = interactive;
-
-    if (!interactive) {
-      pointerRef.current.active = false;
-    }
-
-    if (canvasRef.current && layoutRef.current && baseCanvasRef.current) {
-      if (!frameRef.current) {
-        frameRef.current = requestAnimationFrame((time) => {
-          const canvas = canvasRef.current;
-          const ctx = canvas?.getContext("2d");
-          const layout = layoutRef.current;
-          const baseCanvas = baseCanvasRef.current;
-
-          if (!canvas || !ctx || !layout || !baseCanvas) {
-            frameRef.current = null;
-            return;
-          }
-
-          ctx.clearRect(0, 0, layout.cssWidth, layout.cssHeight);
-          ctx.drawImage(baseCanvas, 0, 0);
-
-          frameRef.current = null;
-        });
-      }
-    }
-  }, [interactive]);
-
-  useEffect(() => {
     const container = containerRef.current;
     const canvas = canvasRef.current;
+
     if (!container || !canvas) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    const getInteractiveState = () => {
+      return interactiveRef.current && isDesktopRef.current;
+    };
 
     const buildLayout = (cssWidth, cssHeight) => {
       const hexWidth = Math.sqrt(3) * HEX_SIZE;
@@ -279,22 +259,6 @@ export default function HoneycombGridCanvas({ interactive = true }) {
       if (!baseCtx) return;
 
       baseCtx.clearRect(0, 0, cssWidth, cssHeight);
-
-      const ambientGlow = baseCtx.createRadialGradient(
-        cssWidth * 0.72,
-        cssHeight * 0.46,
-        cssWidth * 0.06,
-        cssWidth * 0.72,
-        cssHeight * 0.46,
-        cssWidth * 0.42
-      );
-      ambientGlow.addColorStop(0, "rgba(255, 208, 96, 0.18)");
-      ambientGlow.addColorStop(0.28, "rgba(255, 176, 52, 0.10)");
-      ambientGlow.addColorStop(0.62, "rgba(158, 78, 0, 0.045)");
-      ambientGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
-
-      baseCtx.fillStyle = ambientGlow;
-      baseCtx.fillRect(0, 0, cssWidth, cssHeight);
 
       const strokeGradient = baseCtx.createLinearGradient(
         0,
@@ -361,6 +325,15 @@ export default function HoneycombGridCanvas({ interactive = true }) {
       pointerRef.current.y = pointerRef.current.clientY - rect.top;
     };
 
+    const resetLevels = () => {
+      const layout = layoutRef.current;
+      if (!layout) return;
+
+      for (const hex of layout.items) {
+        hex.level = 0;
+      }
+    };
+
     const updateLevels = () => {
       const layout = layoutRef.current;
       if (!layout) return false;
@@ -375,7 +348,7 @@ export default function HoneycombGridCanvas({ interactive = true }) {
       for (const hex of items) {
         let target = 0;
 
-        if (interactiveRef.current && active && x !== null && y !== null) {
+        if (getInteractiveState() && active && x !== null && y !== null) {
           const dx = x - hex.cx;
           const dy = y - hex.cy;
           const distSq = dx * dx + dy * dy;
@@ -401,7 +374,7 @@ export default function HoneycombGridCanvas({ interactive = true }) {
     };
 
     const drawInteractive = (time) => {
-      if (!interactiveRef.current) return;
+      if (!getInteractiveState()) return;
 
       const layout = layoutRef.current;
       if (!layout) return;
@@ -451,7 +424,7 @@ export default function HoneycombGridCanvas({ interactive = true }) {
 
       frameRef.current = null;
 
-      if (interactiveRef.current && hasActive) {
+      if (getInteractiveState() && hasActive) {
         scheduleDraw();
       }
     };
@@ -461,14 +434,32 @@ export default function HoneycombGridCanvas({ interactive = true }) {
       frameRef.current = requestAnimationFrame(draw);
     };
 
+    const updateDeviceMode = () => {
+      const nextIsDesktop = window.innerWidth >= DESKTOP_BREAKPOINT;
+      const modeChanged = isDesktopRef.current !== nextIsDesktop;
+
+      isDesktopRef.current = nextIsDesktop;
+
+      if (!nextIsDesktop) {
+        pointerRef.current.active = false;
+        pointerRef.current.x = null;
+        pointerRef.current.y = null;
+        pointerRef.current.clientX = null;
+        pointerRef.current.clientY = null;
+        resetLevels();
+      }
+
+      if (modeChanged) {
+        scheduleDraw();
+      }
+    };
+
     const resize = () => {
       const rect = container.getBoundingClientRect();
       const cssWidth = Math.round(rect.width);
       const cssHeight = Math.round(rect.height);
 
-      if (cssWidth < 20 || cssHeight < 20) {
-        return;
-      }
+      if (cssWidth < 20 || cssHeight < 20) return;
 
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
 
@@ -490,12 +481,13 @@ export default function HoneycombGridCanvas({ interactive = true }) {
 
       resizeRafRef.current = requestAnimationFrame(() => {
         resizeRafRef.current = null;
+        updateDeviceMode();
         resize();
       });
     };
 
     const handlePointerMove = (event) => {
-      if (!interactiveRef.current) return;
+      if (!getInteractiveState()) return;
 
       pointerRef.current.clientX = event.clientX;
       pointerRef.current.clientY = event.clientY;
@@ -506,18 +498,22 @@ export default function HoneycombGridCanvas({ interactive = true }) {
     };
 
     const handlePointerLeave = () => {
+      if (!getInteractiveState()) return;
+
       pointerRef.current.active = false;
       scheduleDraw();
     };
 
     const handleScroll = () => {
-      if (!interactiveRef.current) return;
+      if (!getInteractiveState()) return;
 
       updatePointerLocalPosition();
       scheduleDraw();
     };
 
-    requestResize();
+    interactiveRef.current = interactive;
+    updateDeviceMode();
+    resize();
 
     const observer = new ResizeObserver(requestResize);
     observer.observe(container);
@@ -548,17 +544,13 @@ export default function HoneycombGridCanvas({ interactive = true }) {
         resizeRafRef.current = null;
       }
     };
-  }, []);
+  }, [interactive]);
 
   return (
     <div
       ref={containerRef}
       className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
     >
-      <div className="honey-glow honey-glow-1" />
-      <div className="honey-glow honey-glow-2" />
-      <div className="honey-vignette" />
-
       <canvas
         ref={canvasRef}
         className="absolute inset-0 h-full w-full"

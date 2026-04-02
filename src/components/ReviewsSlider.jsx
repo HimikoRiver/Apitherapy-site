@@ -60,11 +60,17 @@ export default function ReviewsSlider({
   }, [reviews, slideSize]);
 
   const totalPages = pages.length || 1;
-  const isMobile = viewportWidth < 768;
+  const isTouchSlider = viewportWidth < 1280;
 
   useEffect(() => {
     setActivePage(0);
   }, [activeCategory, slideSize]);
+
+  useEffect(() => {
+    if (activePage > totalPages - 1) {
+      setActivePage(Math.max(totalPages - 1, 0));
+    }
+  }, [activePage, totalPages]);
 
   useEffect(() => {
     if (totalPages <= 1) return;
@@ -94,7 +100,7 @@ export default function ReviewsSlider({
   };
 
   const handleTouchEnd = () => {
-    if (!touchStartX.current || !touchEndX.current) return;
+    if (touchStartX.current == null || touchEndX.current == null) return;
 
     const delta = touchStartX.current - touchEndX.current;
 
@@ -111,9 +117,9 @@ export default function ReviewsSlider({
     <div className="relative">
       <div
         className="overflow-hidden"
-        onTouchStart={isMobile ? handleTouchStart : undefined}
-        onTouchMove={isMobile ? handleTouchMove : undefined}
-        onTouchEnd={isMobile ? handleTouchEnd : undefined}
+        onTouchStart={isTouchSlider ? handleTouchStart : undefined}
+        onTouchMove={isTouchSlider ? handleTouchMove : undefined}
+        onTouchEnd={isTouchSlider ? handleTouchEnd : undefined}
       >
         <motion.div
           animate={{ x: `-${activePage * 100}%` }}
@@ -141,7 +147,7 @@ export default function ReviewsSlider({
       <SliderPagination
         totalPages={totalPages}
         activePage={activePage}
-        isMobile={isMobile}
+        isMobile={viewportWidth < 768}
         onChange={setActivePage}
       />
     </div>

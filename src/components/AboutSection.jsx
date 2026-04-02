@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { features, infoCards } from "@/data/aboutData";
 import AboutFeatures from "@/components/AboutFeatures";
 import AboutInfoCards from "@/components/AboutInfoCards";
+import AboutBeeParticles from "@/components/AboutBeeParticles";
 
 export default function AboutSection() {
   const featuresRef = useRef(null);
@@ -29,7 +30,7 @@ export default function AboutSection() {
   return (
     <section
       id="about"
-      className="relative overflow-hidden border-t border-white/5 bg-[#050507] px-6 py-24 md:py-32"
+      className="relative overflow-hidden border-t border-white/5 bg-[#050507] px-6"
     >
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-[12%] top-24 h-64 w-64 rounded-full bg-amber-300/8 blur-3xl" />
@@ -90,11 +91,15 @@ export default function AboutSection() {
           </div>
         </div>
 
-        <AboutFeatures
-          features={features}
-          featuresRef={featuresRef}
-          featuresVisible={featuresVisible}
-        />
+        <div className="relative">
+          <AboutFeatures
+            features={features}
+            featuresRef={featuresRef}
+            featuresVisible={featuresVisible}
+          />
+
+          <AboutBeeParticles />
+        </div>
 
         <AboutInfoCards infoCards={infoCards} />
       </div>

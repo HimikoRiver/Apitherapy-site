@@ -30,7 +30,7 @@ export default function ServicesSection() {
   return (
     <section
       id="services"
-      className="relative overflow-hidden border-t border-white/5 bg-black px-4 py-16 text-white sm:px-6 lg:px-8"
+      className="relative overflow-hidden border-t border-white/5 bg-black px-4 pb-10 text-white sm:px-6 lg:px-8"
     >
       <div className="relative z-10 mx-auto max-w-6xl">
         {/* верх */}

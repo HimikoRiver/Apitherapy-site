@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 
-import HoneycombGrid from "@/components/HoneycombGrid";
+import HoneycombGridCanvas from "@/components/HoneycombGridCanvas";
 import ReviewsFiltersBlock from "@/components/ReviewsFiltersBlock";
 import ReviewModal from "@/components/ReviewModal";
 import ReviewsSlider from "@/components/ReviewsSlider";
@@ -37,8 +37,8 @@ export default function ReviewsSection() {
       id="reviews"
       className="relative overflow-hidden border-t border-white/5 bg-[#08080b] px-4 pt-16 pb-6 md:px-6 md:pt-20 md:pb-12 xl:pb-16"
     >
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.72]">
-        <HoneycombGrid />
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <HoneycombGridCanvas />
       </div>
 
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 hidden overflow-visible md:block md:h-[330px] lg:h-[390px] xl:h-[430px]">
@@ -60,8 +60,6 @@ export default function ReviewsSection() {
         </motion.div>
       </div>
 
-      <div className="absolute inset-0 z-[1] pointer-events-none bg-[radial-gradient(circle_at_50%_38%,rgba(255,181,72,0.08),transparent_30%),radial-gradient(circle_at_50%_70%,rgba(255,181,72,0.05),transparent_40%)]" />
-
       <div className="relative z-20 mx-auto max-w-7xl">
         <div className="mb-8 max-w-4xl md:mb-9">
           <p className="mb-3 text-xs uppercase tracking-[0.32em] text-amber-200/85 md:text-sm">
@@ -72,11 +70,13 @@ export default function ReviewsSection() {
             Истории пациентов и результаты лечения
           </h2>
 
-          <p className="mt-4 max-w-3xl text-sm leading-6 text-white/82 md:text-[15px] md:leading-7">
-            Здесь собраны реальные отзывы пациентов после прохождения курса
-            апитерапии. Мы разделили их по темам, чтобы было легче найти
-            похожую ситуацию.
-          </p>
+          <div className="mt-4 inline-block max-w-3xl rounded-2xl border border-amber-300/12 bg-[#120d09]/72 px-4 py-3 shadow-[0_10px_30px_rgba(0,0,0,0.16)] backdrop-blur-sm md:px-5 md:py-4">
+            <p className="text-sm leading-6 text-white/86 md:text-[15px] md:leading-7">
+              Здесь собраны реальные отзывы пациентов после прохождения курса
+              апитерапии. Мы разделили их по темам, чтобы было легче найти
+              похожую ситуацию.
+            </p>
+          </div>
         </div>
 
         <ReviewsFiltersBlock
