@@ -11,67 +11,14 @@ import {
   Bug,
 } from "lucide-react";
 
-const serviceCards = [
-  {
-    title: "Пчелоужаление",
-    text: "Основной формат работы —\nвоздействие с помощью\nужаливания пчелами\nпо выбранной схеме.",
-    icon: Bug,
-  },
-  {
-    title: "Индивидуальный подход",
-    text: "Схема работы подбирается\nпо состоянию человека,\nжалобам и реакции\nорганизма в процессе.",
-    icon: HeartHandshake,
-  },
-  {
-    title: "Курс процедур",
-    text: "Количество сеансов,\nинтенсивность и частота\nопределяются персонально\nпод конкретный запрос.",
-    icon: Shield,
-  },
-  {
-    title: "Точечное воздействие",
-    text: "Воздействие проводится\nна определённые зоны,\nчто позволяет работать\nс проблемными участками.",
-    icon: Sparkles,
-  },
-];
+import { serviceCards, accordionItems } from "@/data/servicesData";
 
-const accordionItems = [
-  {
-    title: "Межпозвонковая грыжа",
-    text: "Апитерапия применяется при межпозвонковой грыже с учетом локализации проблемы, выраженности симптомов и общего состояния человека.",
-  },
-  {
-    title: "Неврит лицевого нерва",
-    text: "При неврите лицевого нерва подбирается индивидуальная схема апитерапевтического воздействия.",
-  },
-  {
-    title: "Воспаление седалищного нерва",
-    text: "При воспалении седалищного нерва курс пчелоужаления подбирается по жалобам и зоне распространения боли.",
-  },
-  {
-    title: "Невралгия тройничного нерва",
-    text: "Работа с невралгией тройничного нерва требует точного и аккуратного подхода.",
-  },
-  {
-    title: "Рассеянный склероз",
-    text: "Апитерапия включается в индивидуальный курс работы с учетом состояния человека.",
-  },
-  {
-    title: "Болезнь Паркинсона",
-    text: "Курс апитерапии подбирается персонально с учетом самочувствия.",
-  },
-  {
-    title: "Артрит и артроз",
-    text: "Апитерапия применяется для работы с суставами и болевыми ощущениями.",
-  },
-  {
-    title: "Подагра",
-    text: "Формат апитерапии зависит от стадии состояния и текущих жалоб.",
-  },
-  {
-    title: "Варикозное расширение вен",
-    text: "Схема работы определяется после оценки состояния.",
-  },
-];
+const iconMap = {
+  Sparkles,
+  HeartHandshake,
+  Shield,
+  Bug,
+};
 
 export default function ServicesSection() {
   const [openIndex, setOpenIndex] = useState(0);
@@ -86,7 +33,7 @@ export default function ServicesSection() {
       className="relative overflow-hidden border-t border-white/5 bg-black px-4 py-16 text-white sm:px-6 lg:px-8"
     >
       <div className="relative z-10 mx-auto max-w-6xl">
-        {/* верхний блок с цветами */}
+        {/* верх */}
         <div className="grid items-center gap-8 lg:grid-cols-[1.05fr_1fr]">
           <div className="relative h-[320px] sm:h-[380px] lg:h-[460px]">
             <Image
@@ -97,7 +44,6 @@ export default function ServicesSection() {
               sizes="(max-width: 639px) 100vw, (max-width: 1023px) 70vw, 560px"
             />
 
-            {/* летающие пчёлы */}
             <BeeSwarm />
           </div>
 
@@ -122,43 +68,43 @@ export default function ServicesSection() {
           </div>
         </div>
 
-        {/* карточки услуг */}
+        {/* карточки */}
         <div className="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-4 [perspective:1400px]">
           {serviceCards.map((card) => {
-            const Icon = card.icon;
+            const Icon = iconMap[card.iconName] || Bug;
 
             return (
               <div key={card.title} className="group relative">
                 <article className="relative h-full overflow-hidden rounded-[28px] border border-white/10 bg-[#0b0b10]/90 p-6 shadow-[0_10px_40px_rgba(0,0,0,0.28)] transition-all duration-500 ease-out group-hover:-translate-y-2 group-hover:rotate-x-6 group-hover:border-amber-200/25 group-hover:shadow-[0_20px_60px_rgba(0,0,0,0.45)] [transform-style:preserve-3d]">
-                  <div className="pointer-events-none absolute inset-0 rounded-[28px] bg-gradient-to-br from-amber-200/[0.06] via-transparent to-violet-400/[0.04] opacity-80" />
-                  <div className="pointer-events-none absolute -left-1/3 top-0 h-full w-1/2 -translate-x-full skew-x-[-22deg] bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 transition-all duration-700 group-hover:translate-x-[260%] group-hover:opacity-100" />
+                  <div className="pointer-events-none absolute inset-0 rounded-[28px] bg-gradient-to-br from-amber-200/[0.05] via-transparent to-violet-400/[0.03] opacity-80" />
 
                   <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-amber-300/10 blur-3xl transition duration-500 group-hover:bg-amber-300/15" />
                   <div className="pointer-events-none absolute -left-8 bottom-0 h-24 w-24 rounded-full bg-violet-400/8 blur-3xl transition duration-500 group-hover:bg-violet-400/12" />
 
-<div className="relative z-10 mx-auto w-full max-w-[240px] sm:mx-0 sm:max-w-none">
-  <div className="flex items-center gap-3">
-    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[18px] border border-amber-200/15 bg-[#1a1510]/80 text-[#d6b25e] shadow-[0_10px_24px_rgba(0,0,0,0.18)]">
-      <Icon className="h-5 w-5 shrink-0 text-[#d6b25e]" />
-    </div>
+                  <div className="pointer-events-none absolute -left-1/3 top-0 h-full w-1/2 -translate-x-[160%] skew-x-[-22deg] bg-gradient-to-r from-transparent via-white/18 to-transparent opacity-0 transition-all duration-1000 ease-out group-hover:translate-x-[330%] group-hover:opacity-100" />
 
-    <h3 className="text-[18px] font-semibold leading-[1.5] text-white sm:text-[20px] sm:leading-tight">
-      {card.title}
-    </h3>
-  </div>
+                  <div className="relative z-10 mx-auto w-full max-w-[240px] sm:mx-0 sm:max-w-none">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-[18px] border border-amber-200/15 bg-[#1a1510]/80 text-[#d6b25e] shadow-[0_10px_24px_rgba(0,0,0,0.18)]">
+                        <Icon className="h-5 w-5" />
+                      </div>
 
-  <p className="mt-5 whitespace-pre-line text-[15px] leading-8 text-white/80">
-    {card.text}
-  </p>
-</div>
+                      <h3 className="text-[18px] font-semibold text-white sm:text-[20px]">
+                        {card.title}
+                      </h3>
+                    </div>
 
+                    <p className="mt-5 whitespace-pre-line text-[15px] leading-8 text-white/80">
+                      {card.text}
+                    </p>
+                  </div>
                 </article>
               </div>
             );
           })}
         </div>
 
-        {/* аккордеон состояний */}
+        {/* аккордеон */}
         <div className="mt-10 rounded-[28px] border border-amber-200/10 bg-[#110d0b]/88 p-4 sm:p-5 lg:p-6">
           <div className="mb-5">
             <p className="text-xs uppercase tracking-[0.32em] text-amber-200/60 sm:text-sm">
@@ -179,7 +125,7 @@ export default function ServicesSection() {
               return (
                 <div
                   key={item.title}
-                  className="overflow-hidden rounded-[20px] border border-amber-200/10 bg-[rgba(255,249,239,0.96)] text-zinc-900"
+                  className="overflow-hidden rounded-[20px] border border-amber-200/10 bg-[#f5e6c8] text-zinc-900"
                 >
                   <button
                     id={buttonId}
@@ -187,32 +133,34 @@ export default function ServicesSection() {
                     aria-expanded={isOpen}
                     aria-controls={contentId}
                     onClick={() => handleAccordionToggle(index)}
-                    className="flex w-full items-center justify-between gap-4 px-4 py-4 text-left sm:px-5"
+                    className="flex w-full items-center justify-between px-4 py-4 text-left sm:px-5"
                   >
-                    <span className="text-[15px] font-semibold sm:text-base">
-                      {item.title}
-                    </span>
+                    <span className="font-semibold">{item.title}</span>
 
                     <ChevronDown
                       size={18}
-                      className={`shrink-0 transition-transform ${
+                      className={`transition-transform ${
                         isOpen ? "rotate-180" : ""
                       }`}
                     />
                   </button>
 
-                  {isOpen && (
-                    <div
-                      id={contentId}
-                      role="region"
-                      aria-labelledby={buttonId}
-                      className="border-t border-zinc-900/10 px-4 pb-4 pt-3 sm:px-5 sm:pb-5"
-                    >
+                  <div
+                    id={contentId}
+                    role="region"
+                    aria-labelledby={buttonId}
+                    className={`overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                      isOpen
+                        ? "max-h-[800px] opacity-100 translate-y-0"
+                        : "max-h-0 opacity-0 -translate-y-2"
+                    }`}
+                  >
+                    <div className="border-t border-zinc-900/10 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
                       <p className="text-sm leading-7 text-zinc-700">
                         {item.text}
                       </p>
                     </div>
-                  )}
+                  </div>
                 </div>
               );
             })}

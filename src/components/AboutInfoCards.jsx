@@ -10,6 +10,8 @@ export default function AboutInfoCards({ infoCards }) {
 
             <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-amber-300/8 blur-3xl transition duration-500 group-hover:bg-amber-300/12" />
 
+            <div className="pointer-events-none absolute -left-1/3 top-0 h-full w-1/2 -translate-x-[160%] skew-x-[-22deg] bg-gradient-to-r from-transparent via-white/18 to-transparent opacity-0 transition-all duration-1000 ease-out group-hover:translate-x-[330%] group-hover:opacity-100" />
+
             <div className="relative z-10">
               <p className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.24em] text-[#d6b25e]">
                 <Icon className="h-5 w-5 shrink-0 text-[#d6b25e]" />
