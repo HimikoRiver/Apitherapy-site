@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Clock3, MapPin, Send } from "lucide-react";
+import { Clock3, MapPin } from "lucide-react";
 
 import ContactsMap from "@/components/contacts/ContactsMap";
-import SocialLinkCard from "@/components/contacts/SocialLinkCard";
+import FooterMini from "@/components/FooterMini";
 import { offices, socials } from "@/data/contactsData";
 
 const headerVariants = {
@@ -67,6 +67,27 @@ const officeCardVariants = {
   }),
 };
 
+const footerSocialBlock = {
+  eyebrow: "Онлайн",
+  title: "Мессенджеры и соцсети",
+  links: socials.map((item) => {
+    let icon = "telegram";
+
+    if (item.name.toLowerCase().includes("whatsapp")) {
+      icon = "whatsapp";
+    } else if (item.name.toLowerCase().includes("instagram")) {
+      icon = "instagram";
+    }
+
+    return {
+      label: item.name,
+      href: item.href,
+      icon,
+      external: true,
+    };
+  }),
+};
+
 export default function ContactsSection() {
   return (
     <section
@@ -113,7 +134,7 @@ export default function ContactsSection() {
           </h2>
         </motion.div>
 
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -179,60 +200,13 @@ export default function ContactsSection() {
             </div>
           </motion.div>
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: false, amount: 0.22 }}
-            variants={cardRevealFromLeft}
-            className="relative w-full overflow-visible rounded-[30px] border border-white/10 bg-white/[0.03] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.32)] backdrop-blur-sm md:p-6"
-          >
-            <div className="pointer-events-none absolute inset-0 rounded-[30px] bg-[radial-gradient(circle_at_top_left,rgba(255,220,120,0.10),transparent_24%),linear-gradient(180deg,rgba(255,255,255,0.02),transparent_45%)]" />
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-200/25 to-transparent" />
-
-            <div className="relative flex w-full flex-col items-center gap-6 text-center md:flex-row md:items-center md:justify-between md:text-left">
-              <div className="shrink-0">
-                <div className="flex flex-col items-center gap-3 sm:flex-row md:items-center">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-amber-200/20 bg-amber-300/10 shadow-[0_0_30px_rgba(255,191,73,0.12)]">
-                    <Send className="h-5 w-5 text-amber-200" />
-                  </div>
-
-                  <div>
-                    <p className="text-sm uppercase tracking-[0.25em] text-amber-200/65">
-                      онлайн
-                    </p>
-                    <p className="text-lg font-medium text-white">
-                      Мессенджеры и соцсети
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex w-full justify-center md:justify-end">
-                <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4">
-                  {socials.map((item) => (
-                    <SocialLinkCard key={item.name} item={item} />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          <div className="pt-8">
-            <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-
-            <div className="mt-5 flex flex-col gap-3 text-white/45 md:flex-row md:items-end md:justify-between">
-              <div className="text-xs uppercase tracking-[0.18em] text-white/40">
-                © 2026 Himiko River — Все права защищены
-              </div>
-
-              <div className="max-w-3xl text-[10px] leading-5 text-white/28 md:text-right">
-                Instagram принадлежит компании Meta Platforms Inc., деятельность
-                которой признана экстремистской и запрещена на территории
-                Российской Федерации. Упоминание осуществляется исключительно в
-                информационных целях.
-              </div>
-            </div>
-          </div>
+          <FooterMini
+            showSocialBlock
+            socialBlock={footerSocialBlock}
+            useInnerContainer={false}
+            outerPaddingClassName="px-6 md:px-10 lg:px-16"
+            contentWidthClassName="max-w-7xl"
+          />
         </div>
       </div>
     </section>

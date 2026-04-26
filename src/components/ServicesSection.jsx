@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import BeeSwarm from "@/components/BeeSwarm";
 import {
@@ -33,7 +34,6 @@ export default function ServicesSection() {
       className="relative overflow-hidden border-t border-white/5 bg-black px-4 pb-10 text-white sm:px-6 lg:px-8"
     >
       <div className="relative z-10 mx-auto max-w-6xl">
-        {/* верх */}
         <div className="grid items-center gap-8 lg:grid-cols-[1.05fr_1fr]">
           <div className="relative h-[320px] sm:h-[380px] lg:h-[460px]">
             <Image
@@ -61,14 +61,12 @@ export default function ServicesSection() {
 
             <div className="mt-6 rounded-[22px] border border-amber-200/12 bg-[#17110d]/80 p-4 backdrop-blur-sm">
               <p className="text-sm leading-7 text-amber-50/90 sm:text-[15px]">
-                Бесплатная консультация и первый пробный сеанс проводятся
-                бесплатно.
+                Консультация и первый пробный сеанс проводятся бесплатно.
               </p>
             </div>
           </div>
         </div>
 
-        {/* карточки */}
         <div className="mt-10 grid gap-6 sm:grid-cols-2 xl:grid-cols-4 [perspective:1400px]">
           {serviceCards.map((card) => {
             const Icon = iconMap[card.iconName] || Bug;
@@ -104,7 +102,6 @@ export default function ServicesSection() {
           })}
         </div>
 
-        {/* аккордеон */}
         <div className="mt-10 rounded-[28px] border border-amber-200/10 bg-[#110d0b]/88 p-4 sm:p-5 lg:p-6">
           <div className="mb-5">
             <p className="text-xs uppercase tracking-[0.32em] text-amber-200/60 sm:text-sm">
@@ -149,16 +146,27 @@ export default function ServicesSection() {
                     id={contentId}
                     role="region"
                     aria-labelledby={buttonId}
-                    className={`overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                    className={`overflow-hidden transition-all duration-700 ${
                       isOpen
-                        ? "max-h-[800px] opacity-100 translate-y-0"
-                        : "max-h-0 opacity-0 -translate-y-2"
+                        ? "max-h-[900px] opacity-100"
+                        : "max-h-0 opacity-0"
                     }`}
                   >
                     <div className="border-t border-zinc-900/10 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
                       <p className="text-sm leading-7 text-zinc-700">
                         {item.text}
                       </p>
+
+                      {item.href ? (
+                        <div className="mt-4">
+                          <Link
+                            href={item.href}
+                            className="inline-flex items-center rounded-[14px] border border-zinc-900/10 bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition duration-300 hover:-translate-y-0.5 hover:bg-zinc-800"
+                          >
+                            Подробнее
+                          </Link>
+                        </div>
+                      ) : null}
                     </div>
                   </div>
                 </div>

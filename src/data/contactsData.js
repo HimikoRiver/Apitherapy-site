@@ -31,3 +31,25 @@ export const socials = [
     qr: "/icons/qr-instagram.png",
   },
 ];
+
+// 🔥 ВОТ ЭТОГО У ТЕБЯ НЕ ХВАТАЛО
+export const footerSocialBlock = {
+  eyebrow: "Онлайн",
+  title: "Мессенджеры и соцсети",
+  links: socials.map((item) => {
+    let icon = "telegram";
+
+    if (item.name.toLowerCase().includes("whatsapp")) {
+      icon = "whatsapp";
+    } else if (item.name.toLowerCase().includes("instagram")) {
+      icon = "instagram";
+    }
+
+    return {
+      label: item.name,
+      href: item.href,
+      icon,
+      external: true,
+    };
+  }),
+};

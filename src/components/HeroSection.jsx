@@ -309,11 +309,11 @@ export default function HeroSection() {
                       className="mb-4 text-xs uppercase tracking-[0.45em] text-amber-200/80 md:mb-6 md:text-sm"
                       style={styles.badge}
                     >
-                      Апитерапевт
+                      Апитерапия в Грозном
                     </p>
 
                     <h1
-                      className="text-[58px] min-[391px]:text-5xl font-semibold uppercase leading-[0.9] tracking-[0.04em] text-white md:text-7xl min-[1181px]:text-[108px] xl:text-[120px]"
+                      className="text-[58px] min-[391px]:text-5xl font-semibold  leading-[0.9] tracking-[0.04em] text-white md:text-7xl min-[1181px]:text-[108px] xl:text-[120px]"
                       style={styles.title}
                     >
                       <span className="block">Dr.</span>

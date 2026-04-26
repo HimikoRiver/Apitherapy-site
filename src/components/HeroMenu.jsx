@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-const navItems = [
+const defaultNavItems = [
   { label: "Главная", href: "#hero-track", id: "hero-track" },
   { label: "Обо мне", href: "#about", id: "about" },
   { label: "Услуги", href: "#services", id: "services" },
@@ -18,6 +18,7 @@ export default function HeroMenu({
   isAtTop,
   handleScrollEdge,
   menuShellStyle,
+  navItems = defaultNavItems,
 }) {
   const menuRef = useRef(null);
 
@@ -54,18 +55,29 @@ export default function HeroMenu({
   const onNavItemClick = (event, href) => {
     event.preventDefault();
 
-    const targetId = href.replace("#", "");
-    const targetElement = document.getElementById(targetId);
+    const isLocalAnchor = href.startsWith("#");
+    const isHomeAnchor = href.startsWith("/#");
 
-    if (targetElement) {
-      targetElement.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+    if (isLocalAnchor) {
+      const targetId = href.replace("#", "");
+      const targetElement = document.getElementById(targetId);
+
+      if (targetElement) {
+        targetElement.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    } else if (isHomeAnchor) {
+      window.location.href = href;
+      return;
+    } else {
+      window.location.href = href;
+      return;
     }
 
     if (typeof handleNavClick === "function") {
-      handleNavClick(event);
+      handleNavClick(event, href);
     }
 
     toggleMenu();

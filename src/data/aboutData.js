@@ -6,20 +6,21 @@ import {
 
 export const features = [
   {
-    icon: "/icons/14.webp",
-    title: "8 лет",
-    text: "опыт практики",
+    icon: "/icons/4.webp",
+    title: "Спокойная",
+    text: "работа без спешки",
   },
   {
     icon: "/icons/22.webp",
     title: "Частная практика",
-    text: "",
+    text: "в Грозном",
   },
-  {
-    icon: "/icons/4.webp",
-    title: "Спокойная и внимательная",
-    text: "работа без спешки",
+    {
+    icon: "/icons/14.webp",
+    title: "8 лет практики",
+    text: "более 3000 пациентов",
   },
+
   {
     icon: "/icons/3.webp",
     title: "Индивидуальный подход",
