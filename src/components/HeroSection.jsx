@@ -12,6 +12,14 @@ const BeeModel = dynamic(() => import("@/components/BeeModel"), {
   loading: () => null,
 });
 
+const HeroBeeFlowerScene = dynamic(
+  () => import("@/components/HeroBeeFlowerScene"),
+  {
+    ssr: false,
+    loading: () => null,
+  }
+);
+
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
@@ -383,12 +391,12 @@ export default function HeroSection() {
               </div>
 
               <div
-                className="absolute inset-0 flex items-center justify-center overflow-visible"
+                className="absolute inset-0 z-40 flex items-center justify-center overflow-visible"
                 style={styles.beeWrap}
               >
-                <div className="h-[620px] w-full max-w-[720px] overflow-visible">
-                  {showBee && <BeeModel interactive />}
-                </div>
+<div className="h-[760px] w-full max-w-[820px] translate-y-[20px] overflow-visible">
+  {showBee && <HeroBeeFlowerScene />}
+</div>
               </div>
             </div>
           </div>
