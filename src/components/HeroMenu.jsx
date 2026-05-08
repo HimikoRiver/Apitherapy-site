@@ -1,6 +1,14 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef } from "react";
+import {
+  Home,
+  UserRound,
+  Flower2,
+  MessageSquareHeart,
+  MapPin,
+} from "lucide-react";
 
 const defaultNavItems = [
   { label: "Главная", href: "#hero-track", id: "hero-track" },
@@ -9,6 +17,14 @@ const defaultNavItems = [
   { label: "Отзывы", href: "#reviews", id: "reviews" },
   { label: "Контакты", href: "#contacts", id: "contacts" },
 ];
+
+const NAV_ICON_MAP = {
+  Главная: Home,
+  "Обо мне": UserRound,
+  Услуги: Flower2,
+  Отзывы: MessageSquareHeart,
+  Контакты: MapPin,
+};
 
 export default function HeroMenu({
   menuOpen,
@@ -59,8 +75,7 @@ export default function HeroMenu({
     const isHomeAnchor = href.startsWith("/#");
 
     if (isLocalAnchor) {
-      const targetId = href.replace("#", "");
-      const targetElement = document.getElementById(targetId);
+      const targetElement = document.getElementById(href.replace("#", ""));
 
       if (targetElement) {
         targetElement.scrollIntoView({
@@ -87,116 +102,176 @@ export default function HeroMenu({
     <>
       <div
         aria-hidden="true"
-        className={`fixed inset-0 z-[95] transition-opacity duration-300 ${
+        className={`fixed inset-0 z-[95] transition-opacity duration-500 ${
           menuOpen
-            ? "pointer-events-auto opacity-100 bg-black/8 backdrop-blur-[1.5px] lg:bg-black/6 lg:backdrop-blur-none"
-            : "pointer-events-none opacity-0 bg-transparent backdrop-blur-none"
+            ? "pointer-events-auto bg-black/18 opacity-100 backdrop-blur-[2px] lg:bg-black/8 lg:backdrop-blur-none"
+            : "pointer-events-none bg-transparent opacity-0 backdrop-blur-none"
         }`}
       />
 
       <div
-        className="fixed right-5 top-5 z-[100] md:right-8 md:top-8"
+        className="fixed right-4 top-4 z-[150] md:right-8 md:top-8"
         style={menuShellStyle}
       >
-        <div ref={menuRef} className="relative flex flex-col items-end">
+        <div ref={menuRef} className="relative h-14 w-14">
           <button
             type="button"
-            onClick={toggleMenu}
+            onMouseDown={(event) => event.stopPropagation()}
+            onTouchStart={(event) => event.stopPropagation()}
+            onClick={(event) => {
+              event.stopPropagation();
+              toggleMenu();
+            }}
             aria-label={menuOpen ? "Закрыть меню" : "Открыть меню"}
             aria-expanded={menuOpen}
             aria-controls="hero-menu-nav"
-            className={`relative z-[3] flex items-center justify-center rounded-full transition-all duration-300 ${
-              menuOpen
-                ? "h-10 w-10 translate-x-[-12px] translate-y-[12px] hover:bg-transparent"
-                : "h-10 w-10 hover:bg-white/5"
-            }`}
+            className="relative z-[170] flex h-14 w-14 items-center justify-center rounded-full border border-[#f4d27a]/45 bg-[#070604]/90 text-[#ffe38b] shadow-[0_0_38px_rgba(244,210,122,0.28),inset_0_0_24px_rgba(244,210,122,0.08)] backdrop-blur-md transition-all duration-300 hover:border-[#f4d27a]/70 hover:text-[#f4d27a] hover:shadow-[0_0_52px_rgba(244,210,122,0.42),inset_0_0_26px_rgba(244,210,122,0.12)]"
           >
-            <span className="relative block h-5 w-7">
-              <span
-                className={`absolute left-0 top-0 h-[2px] bg-white transition-all duration-300 ${
+            <span className="pointer-events-none absolute inset-[-6px] rounded-full border border-[#f4d27a]/24" />
+
+            <span className="pointer-events-none absolute inset-[6px] rounded-full border border-[#f4d27a]/10" />
+
+            <span className="pointer-events-none absolute -right-1 bottom-1 h-5 w-5 rounded-full bg-[#f4d27a]/55 blur-md" />
+
+            <svg
+              className={`relative h-10 w-10 drop-shadow-[0_0_10px_rgba(244,210,122,0.45)] transition-transform duration-500 ${
+                menuOpen ? "rotate-45" : "rotate-0"
+              }`}
+              viewBox="0 0 100 100"
+            >
+              <path
+                className={`fill-none stroke-[#f4d27a] transition-[stroke-dasharray,stroke-dashoffset] duration-500 [stroke-linecap:round] [stroke-width:5.5] ${
                   menuOpen
-                    ? "w-7 translate-y-[8px] rotate-45"
-                    : "w-7"
+                    ? "[stroke-dasharray:40_172] [stroke-dashoffset:-132px]"
+                    : "[stroke-dasharray:40_172] [stroke-dashoffset:0]"
                 }`}
+                d="m 30,33 h 40 c 13.100415,0 14.380204,31.80258 6.899646,33.421777 -24.612039,5.327373 9.016154,-52.337577 -12.75751,-30.563913 l -28.284272,28.284272"
               />
-              <span
-                className={`absolute right-0 top-[8px] h-[2px] bg-white transition-all duration-300 ${
-                  menuOpen ? "w-0 opacity-0" : "w-5 opacity-100"
-                }`}
-              />
-              <span
-                className={`absolute left-0 top-[16px] h-[2px] bg-white transition-all duration-300 ${
+
+              <path
+                className={`fill-none stroke-[#fff3cc] transition-[stroke-dasharray,stroke-dashoffset] duration-500 [stroke-linecap:round] [stroke-width:5.5] ${
                   menuOpen
-                    ? "w-7 translate-y-[-8px] -rotate-45"
-                    : "w-6"
+                    ? "[stroke-dasharray:40_111] [stroke-dashoffset:-71px]"
+                    : "[stroke-dasharray:40_111] [stroke-dashoffset:0]"
                 }`}
+                d="m 70,50 c 0,0 -32.213436,0 -40,0 -7.786564,0 -6.428571,-4.640244 -6.428571,-8.571429 0,-5.895471 6.073743,-11.783399 12.286435,-5.570707 6.212692,6.212692 28.284272,28.284272 28.284272,28.284272"
               />
-            </span>
+
+              <path
+                className={`fill-none stroke-[#f4d27a] transition-[stroke-dasharray,stroke-dashoffset] duration-500 [stroke-linecap:round] [stroke-width:5.5] ${
+                  menuOpen
+                    ? "[stroke-dasharray:40_172] [stroke-dashoffset:-132px]"
+                    : "[stroke-dasharray:40_172] [stroke-dashoffset:0]"
+                }`}
+                d="m 69.575405,67.073826 h -40 c -13.100415,0 -14.380204,-31.80258 -6.899646,-33.421777 24.612039,-5.327373 -9.016154,52.337577 12.75751,30.563913 l 28.284272,-28.284272"
+              />
+            </svg>
           </button>
 
           <div
-            className={`absolute right-0 top-0 origin-top-right overflow-hidden rounded-[30px] border transition-all duration-300 ${
+            className={`absolute right-0 top-7 z-[160] origin-top-right overflow-hidden rounded-[34px] border transition-all duration-500 ease-out ${
               menuOpen
-                ? "pointer-events-auto w-[146px] scale-100 border-white/10 bg-black/78 opacity-100 shadow-[0_20px_55px_rgba(0,0,0,0.48)] backdrop-blur-[6px] sm:w-[154px] md:w-[162px] lg:bg-black/72"
-                : "pointer-events-none h-10 w-10 scale-95 border-transparent bg-transparent opacity-0 shadow-none backdrop-blur-none"
+                ? "pointer-events-auto h-auto w-[354px] scale-100 border-[#f4d27a]/36 bg-[#050403]/94 opacity-100 shadow-[0_28px_90px_rgba(0,0,0,0.68),0_0_68px_rgba(244,210,122,0.26)] backdrop-blur-[12px] max-[390px]:w-[330px] sm:w-[380px]"
+                : "pointer-events-none h-14 w-14 scale-90 border-transparent bg-transparent opacity-0 shadow-none backdrop-blur-none"
             }`}
           >
-            <div className="pointer-events-none absolute inset-0 rounded-[30px] bg-[linear-gradient(180deg,rgba(0,0,0,0.14),rgba(0,0,0,0.3))]" />
-            <div className="pointer-events-none absolute inset-0 rounded-[30px] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.035),transparent_48%)]" />
-            <div className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-[#f2c55c]/24 to-transparent" />
+            <Image
+              src="/img/heroMenu.webp"
+              alt=""
+              fill
+              priority
+              sizes="380px"
+              className="pointer-events-none object-cover opacity-70"
+            />
 
-            <div className="relative flex flex-col items-end px-5 pb-6 pt-5 sm:px-5 md:px-6 md:pb-7 md:pt-6">
-              <div className="h-8 w-8 md:h-9 md:w-9" />
+            <div className="pointer-events-none absolute inset-0 rounded-[34px] bg-[radial-gradient(circle_at_76%_8%,rgba(255,219,125,0.22),transparent_30%),radial-gradient(circle_at_0%_76%,rgba(218,142,31,0.18),transparent_34%),linear-gradient(180deg,rgba(0,0,0,0.10),rgba(0,0,0,0.34))]" />
 
-              <nav
-                id="hero-menu-nav"
-                className={`mt-4 flex flex-col items-end gap-4 transition-all duration-300 md:mt-5 md:gap-[17px] ${
-                  menuOpen
-                    ? "translate-y-0 opacity-100"
-                    : "-translate-y-2 opacity-0"
-                }`}
-              >
-                {navItems.map((item, index) => {
-                  const isActive = activeSection === item.id;
+            <div className="pointer-events-none absolute inset-0 rounded-[34px] shadow-[inset_0_0_30px_rgba(244,210,122,0.14),inset_0_0_95px_rgba(0,0,0,0.72)]" />
 
-                  return (
-                    <a
-                      key={item.href}
-                      href={item.href}
-                      onClick={(event) => onNavItemClick(event, item.href)}
-                      className={`rounded-md py-1 text-right text-sm uppercase tracking-[0.28em] transition-all duration-300 ${
-                        isActive
-                          ? "translate-x-[-4px] text-[#f2c55c]"
-                          : "translate-x-0 text-white/92 hover:text-[#f2c55c]"
-                      }`}
-                      style={{
-                        transitionDelay: menuOpen ? `${index * 50}ms` : "0ms",
-                      }}
-                    >
+            <nav
+              id="hero-menu-nav"
+              className={`relative z-[2] flex flex-col gap-4 px-7 pb-9 pt-20 transition-all duration-500 max-[390px]:px-5 ${
+                menuOpen
+                  ? "translate-y-0 opacity-100"
+                  : "-translate-y-3 opacity-0"
+              }`}
+            >
+              <div className="mb-1 flex items-center justify-between border-b border-[#f4d27a]/18 pb-4">
+                <span className="text-[13px] font-medium uppercase tracking-[0.42em] text-[#f4d27a]">
+                  Меню
+                </span>
+
+                <span className="h-px w-24 bg-gradient-to-r from-[#f4d27a]/10 via-[#f4d27a]/70 to-transparent" />
+              </div>
+
+              {navItems.map((item, index) => {
+                const isActive = activeSection === item.id;
+                const Icon = NAV_ICON_MAP[item.label] ?? Flower2;
+
+                return (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    onClick={(event) => onNavItemClick(event, item.href)}
+                    className={`group relative grid h-[76px] grid-cols-[58px_minmax(118px,1fr)_52px_10px] items-center gap-4 overflow-hidden rounded-[20px] border-b border-[#f4d27a]/16 pr-1 transition-all duration-500 max-[390px]:grid-cols-[54px_minmax(104px,1fr)_44px_10px] max-[390px]:gap-3 ${
+                      isActive
+                        ? "text-[#f4d27a]"
+                        : "text-[#fff7df] hover:text-[#f4d27a]"
+                    }`}
+                    style={{
+                      transitionDelay: menuOpen
+                        ? `${120 + index * 55}ms`
+                        : "0ms",
+                    }}
+                  >
+                    <span className="relative flex h-[58px] w-[58px] shrink-0 items-center justify-center rounded-full border border-[#f4d27a]/42 bg-black/36 text-[#ffe38b] transition-all duration-300 group-hover:border-[#f4d27a]/70 max-[390px]:h-[54px] max-[390px]:w-[54px]">
+                      <Icon className="h-7 w-7 max-[390px]:h-6 max-[390px]:w-6" />
+                    </span>
+
+                    <span className="relative whitespace-nowrap text-[18px] font-medium uppercase tracking-[0.28em] max-[390px]:text-[16px] max-[390px]:tracking-[0.22em]">
                       {item.label}
-                    </a>
-                  );
-                })}
-              </nav>
-            </div>
+                    </span>
+
+                    <span className="h-px w-[52px] shrink-0 bg-gradient-to-r from-[#f4d27a]/16 via-[#f4d27a]/55 to-[#f4d27a]/90 max-[390px]:w-[44px]" />
+
+                    <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#ffd978] shadow-[0_0_20px_rgba(244,210,122,1)] transition-transform duration-300 group-hover:scale-125" />
+                  </a>
+                );
+              })}
+            </nav>
           </div>
         </div>
       </div>
 
       <button
         type="button"
-        onClick={handleScrollEdge}
+        onMouseDown={(event) => event.stopPropagation()}
+        onTouchStart={(event) => event.stopPropagation()}
+        onClick={(event) => {
+          event.stopPropagation();
+          handleScrollEdge();
+        }}
         aria-label={isAtTop ? "Вниз" : "Наверх"}
-        className="fixed bottom-6 right-5 z-[110] flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/6 text-white backdrop-blur-md transition-all duration-300 hover:border-[#f2c55c]/50 hover:bg-white/10 hover:text-[#f2c55c] md:bottom-8 md:right-8"
+        className={`fixed bottom-6 right-5 z-[170] flex h-14 w-14 items-center justify-center rounded-full border border-[#f4d27a]/45 bg-[#070604]/90 text-[#ffe38b] shadow-[0_0_38px_rgba(244,210,122,0.28),inset_0_0_24px_rgba(244,210,122,0.08)] backdrop-blur-md transition-all duration-300 hover:border-[#f4d27a]/70 hover:text-[#f4d27a] hover:shadow-[0_0_52px_rgba(244,210,122,0.42),inset_0_0_26px_rgba(244,210,122,0.12)] md:bottom-8 md:right-8 ${
+          menuOpen
+            ? "pointer-events-none opacity-0 md:pointer-events-auto md:opacity-100"
+            : "pointer-events-auto opacity-100"
+        }`}
       >
+        <span className="pointer-events-none absolute inset-[-6px] rounded-full border border-[#f4d27a]/24" />
+
+        <span className="pointer-events-none absolute inset-[6px] rounded-full border border-[#f4d27a]/10" />
+
+        <span className="pointer-events-none absolute -right-1 bottom-1 h-5 w-5 rounded-full bg-[#f4d27a]/55 blur-md" />
+
         <svg
-          className={`h-6 w-6 transition-transform duration-300 ${
+          className={`relative h-6 w-6 transition-transform duration-300 ${
             isAtTop ? "rotate-180" : "rotate-0"
           }`}
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          strokeWidth="1.8"
+          strokeWidth="2.1"
           strokeLinecap="round"
           strokeLinejoin="round"
         >

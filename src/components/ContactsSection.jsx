@@ -36,24 +36,6 @@ const cardRevealFromRight = {
   },
 };
 
-const cardRevealFromLeft = {
-  hidden: {
-    opacity: 0,
-    x: -56,
-    filter: "blur(6px)",
-  },
-  visible: {
-    opacity: 1,
-    x: 0,
-    filter: "blur(0px)",
-    transition: {
-      duration: 1.05,
-      delay: 0.1,
-      ease: [0.16, 1, 0.3, 1],
-    },
-  },
-};
-
 const officeCardVariants = {
   hidden: { opacity: 0, y: 18 },
   visible: (index) => ({
@@ -65,6 +47,12 @@ const officeCardVariants = {
       ease: "easeOut",
     },
   }),
+};
+
+const QR_MAP = {
+  telegram: "/icons/qr-telegram.png",
+  whatsapp: "/icons/qr-whatsapp.png",
+  instagram: "/icons/qr-instagram.png",
 };
 
 const footerSocialBlock = {
@@ -83,6 +71,7 @@ const footerSocialBlock = {
       label: item.name,
       href: item.href,
       icon,
+      qr: QR_MAP[icon],
       external: true,
     };
   }),

@@ -33,38 +33,44 @@ export default function ConditionSocialLinks({
               <p className="text-sm uppercase tracking-[0.25em] text-amber-200/65">
                 {eyebrow}
               </p>
+
               <p className="text-lg font-medium text-white">{title}</p>
             </div>
           </div>
         </div>
 
-        <div className="flex w-full justify-center md:w-auto md:justify-end md:ml-auto">
+        <div className="flex w-full justify-center md:ml-auto md:w-auto md:justify-end">
           <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4">
             {links.map((item) => {
               const Icon = ICON_MAP[item.icon] ?? Send;
 
               return (
-                <div key={item.label} className="group relative">
-                  {item.qr ? (
-                    <div className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-3 w-[132px] -translate-x-1/2 rounded-[18px] border border-white/10 bg-[#0b0b10]/95 p-2 opacity-0 shadow-[0_18px_40px_rgba(0,0,0,0.35)] transition duration-300 group-hover:translate-y-[-4px] group-hover:opacity-100">
-                      <div className="overflow-hidden rounded-[14px]">
-                        <Image
-                          src={item.qr}
-                          alt={`${item.label} QR`}
-                          width={116}
-                          height={116}
-                          className="h-auto w-full object-contain"
-                        />
+                <div
+                  key={item.label}
+                  className="group flex items-center gap-0 transition-[gap] duration-500 ease-out hover:gap-3"
+                >
+                  <div className="pointer-events-none w-0 overflow-hidden opacity-0 transition-all duration-500 ease-out group-hover:w-[76px] group-hover:opacity-100">
+                    {item.qr ? (
+                      <div className="rounded-[18px] border border-white/10 bg-[#0b0b10]/95 p-2 shadow-[0_18px_40px_rgba(0,0,0,0.35)]">
+                        <div className="overflow-hidden rounded-[14px]">
+                          <Image
+                            src={item.qr}
+                            alt={`${item.label} QR`}
+                            width={60}
+                            height={60}
+                            className="h-auto w-full object-contain"
+                          />
+                        </div>
                       </div>
-                    </div>
-                  ) : null}
+                    ) : null}
+                  </div>
 
                   <Link
                     href={item.href}
                     target={item.external ? "_blank" : undefined}
                     rel={item.external ? "noopener noreferrer" : undefined}
                     aria-label={item.label}
-                    className="group/link inline-flex h-[76px] w-[76px] items-center justify-center rounded-[22px] border border-white/10 bg-white/[0.03] text-white/75 transition duration-300 hover:-translate-y-0.5 hover:border-amber-200/22 hover:bg-white/[0.05] hover:text-[#f4d27a]"
+                    className="group/link inline-flex h-[76px] w-[76px] shrink-0 items-center justify-center rounded-[22px] border border-white/10 bg-white/[0.03] text-white/75 transition duration-300 hover:-translate-y-0.5 hover:border-amber-200/22 hover:bg-white/[0.05] hover:text-[#f4d27a]"
                   >
                     <span className="flex h-12 w-12 items-center justify-center rounded-full border border-amber-200/18 bg-[#17110d]/85 shadow-[0_0_24px_rgba(244,210,122,0.08)] transition duration-300 group-hover/link:border-amber-200/28 group-hover/link:shadow-[0_0_30px_rgba(244,210,122,0.14)]">
                       <Icon className="h-6 w-6" />

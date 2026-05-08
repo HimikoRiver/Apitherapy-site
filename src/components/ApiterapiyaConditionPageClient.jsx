@@ -139,7 +139,7 @@ function renderSection(section) {
 
 export default function ApiterapiyaConditionPageClient({ pageData }) {
   const {
-    backgroundImage = "/img/fon3.webp",
+    backgroundImage = "/img/fon4.webp",
     asideImage = "/img/3dbee.webp",
     hero,
     aside,

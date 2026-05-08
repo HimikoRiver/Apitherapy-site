@@ -36,27 +36,15 @@ function Flower({ onActiveChange, flowerPivotRef }) {
   useEffect(() => {
     scene.traverse((c) => {
       if (!c.isMesh) return;
+
       c.castShadow = false;
       c.receiveShadow = false;
+
       if (c.material) {
         c.material.roughness = 0.72;
         c.material.metalness = 0;
       }
     });
-
-    // 🔥 ВАЖНО: ставим pivot в низ
-    scene.position.set(0, 0, 0);
-    scene.updateMatrixWorld(true);
-
-    const box = new Box3().setFromObject(scene);
-    const bottom = new Vector3(
-      (box.min.x + box.max.x) / 2,
-      box.min.y,
-      (box.min.z + box.max.z) / 2
-    );
-
-    scene.position.set(-bottom.x, -bottom.y, -bottom.z);
-    scene.updateMatrixWorld(true);
   }, [scene]);
 
   useFrame(({ clock }) => {
@@ -77,7 +65,7 @@ function Flower({ onActiveChange, flowerPivotRef }) {
   });
 
   return (
-    <group position={[0.35, -2, -0.25]} scale={1.45}>
+    <group position={[0.35, -0.80, -0.25]} scale={1.45}>
       <group
         ref={flowerPivotRef}
         rotation={[-0.06, -0.68, -0.06]}
@@ -88,6 +76,7 @@ function Flower({ onActiveChange, flowerPivotRef }) {
         }}
         onPointerOut={(e) => {
           e.stopPropagation();
+
           if (!dragging.current) {
             targetX.current = -0.06;
             targetZ.current = -0.06;
@@ -97,10 +86,13 @@ function Flower({ onActiveChange, flowerPivotRef }) {
         }}
         onPointerDown={(e) => {
           e.stopPropagation();
+
           dragging.current = true;
           last.current = { x: e.clientX, y: e.clientY };
+
           document.body.style.cursor = "grabbing";
           onActiveChange(true);
+
           e.target.setPointerCapture?.(e.pointerId);
         }}
         onPointerMove={(e) => {
@@ -116,11 +108,15 @@ function Flower({ onActiveChange, flowerPivotRef }) {
         }}
         onPointerUp={(e) => {
           e.stopPropagation();
+
           dragging.current = false;
+
           targetX.current = -0.06;
           targetZ.current = -0.06;
+
           document.body.style.cursor = "grab";
           onActiveChange(false);
+
           e.target.releasePointerCapture?.(e.pointerId);
         }}
       >
@@ -141,9 +137,9 @@ function Bee({ flowerPivotRef }) {
   const { actions } = useAnimations(animations, groupRef);
 
   useEffect(() => {
-    Object.values(actions || {}).forEach((a) =>
-      a?.reset().fadeIn(0.3).play()
-    );
+    Object.values(actions || {}).forEach((a) => {
+      a?.reset().fadeIn(0.3).play();
+    });
   }, [actions]);
 
   useFrame(({ clock }) => {
