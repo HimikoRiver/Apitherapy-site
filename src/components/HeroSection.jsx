@@ -39,13 +39,9 @@ export default function HeroSection() {
   const [scrollDirection, setScrollDirection] = useState("down");
   const [activeSection, setActiveSection] = useState("hero-track");
   const [isAtTop, setIsAtTop] = useState(true);
-  const [showBee, setShowBee] = useState(false);
+  const showBee = true;
   const [isTouchLike, setIsTouchLike] = useState(false);
   const [isMobileViewport, setIsMobileViewport] = useState(false);
-
-  useEffect(() => {
-    setShowBee(true);
-  }, []);
 
   useEffect(() => {
     const pointerMedia = window.matchMedia("(hover: none), (pointer: coarse)");

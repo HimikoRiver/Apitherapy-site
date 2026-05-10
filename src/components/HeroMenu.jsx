@@ -84,10 +84,10 @@ export default function HeroMenu({
         });
       }
     } else if (isHomeAnchor) {
-      window.location.href = href;
+      window.location.assign(href);
       return;
     } else {
-      window.location.href = href;
+      window.location.assign(href);
       return;
     }
 
