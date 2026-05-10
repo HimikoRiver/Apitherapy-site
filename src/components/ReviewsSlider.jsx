@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
 import ReviewCard from "@/components/ReviewCard";
@@ -10,6 +10,10 @@ const AUTO_SLIDE_MS = 5000;
 const PREVIEW_MAX_MOBILE = 150;
 const PREVIEW_MAX_DESKTOP = 185;
 const SWIPE_THRESHOLD = 50;
+
+function clampPage(page, totalPages) {
+  return Math.max(0, Math.min(page, totalPages - 1));
+}
 
 function chunkArray(arr, size) {
   const chunks = [];
@@ -32,7 +36,7 @@ export default function ReviewsSlider({
   activeCategory,
   onSelectReview,
 }) {
-  const [activePage, setActivePage] = useState(0);
+  const [pageState, setPageState] = useState({ key: "", page: 0 });
   const [viewportWidth, setViewportWidth] = useState(1440);
 
   const touchStartX = useRef(null);
@@ -61,16 +65,30 @@ export default function ReviewsSlider({
 
   const totalPages = pages.length || 1;
   const isTouchSlider = viewportWidth < 1280;
+  const pageResetKey = `${activeCategory}-${slideSize}`;
+  const activePage =
+    pageState.key === pageResetKey
+      ? clampPage(pageState.page, totalPages)
+      : 0;
 
-  useEffect(() => {
-    setActivePage(0);
-  }, [activeCategory, slideSize]);
+  const setActivePage = useCallback(
+    (nextPage) => {
+      setPageState((previousState) => {
+        const currentPage =
+          previousState.key === pageResetKey
+            ? clampPage(previousState.page, totalPages)
+            : 0;
+        const resolvedPage =
+          typeof nextPage === "function" ? nextPage(currentPage) : nextPage;
 
-  useEffect(() => {
-    if (activePage > totalPages - 1) {
-      setActivePage(Math.max(totalPages - 1, 0));
-    }
-  }, [activePage, totalPages]);
+        return {
+          key: pageResetKey,
+          page: clampPage(resolvedPage, totalPages),
+        };
+      });
+    },
+    [pageResetKey, totalPages]
+  );
 
   useEffect(() => {
     if (totalPages <= 1) return;
@@ -80,7 +98,7 @@ export default function ReviewsSlider({
     }, AUTO_SLIDE_MS);
 
     return () => clearInterval(interval);
-  }, [totalPages]);
+  }, [setActivePage, totalPages]);
 
   const goPrev = () => {
     setActivePage((prev) => (prev - 1 + totalPages) % totalPages);
