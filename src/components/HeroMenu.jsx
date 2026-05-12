@@ -110,7 +110,7 @@ export default function HeroMenu({
       />
 
       <div
-        className="fixed right-4 top-4 z-[150] origin-top-right scale-[0.9] md:right-8 md:top-8"
+        className="review-modal-hide-control fixed right-4 top-4 z-[150] origin-top-right scale-[0.9] transition-opacity duration-300 md:right-8 md:top-8"
         style={menuShellStyle}
       >
         <div ref={menuRef} className="relative h-14 w-14">
@@ -128,9 +128,7 @@ export default function HeroMenu({
             className="relative z-[170] flex h-14 w-14 items-center justify-center rounded-full border border-[#f4d27a]/45 bg-[#070604]/90 text-[#ffe38b] shadow-[0_0_38px_rgba(244,210,122,0.28),inset_0_0_24px_rgba(244,210,122,0.08)] backdrop-blur-md transition-all duration-300 hover:border-[#f4d27a]/70 hover:text-[#f4d27a] hover:shadow-[0_0_52px_rgba(244,210,122,0.42),inset_0_0_26px_rgba(244,210,122,0.12)]"
           >
             <span className="pointer-events-none absolute inset-[-6px] rounded-full border border-[#f4d27a]/24" />
-
             <span className="pointer-events-none absolute inset-[6px] rounded-full border border-[#f4d27a]/10" />
-
             <span className="pointer-events-none absolute -right-1 bottom-1 h-5 w-5 rounded-full bg-[#f4d27a]/55 blur-md" />
 
             <svg
@@ -183,7 +181,6 @@ export default function HeroMenu({
             />
 
             <div className="pointer-events-none absolute inset-0 rounded-[34px] bg-[radial-gradient(circle_at_76%_8%,rgba(255,219,125,0.22),transparent_30%),radial-gradient(circle_at_0%_76%,rgba(218,142,31,0.18),transparent_34%),linear-gradient(180deg,rgba(0,0,0,0.10),rgba(0,0,0,0.34))]" />
-
             <div className="pointer-events-none absolute inset-0 rounded-[34px] shadow-[inset_0_0_30px_rgba(244,210,122,0.14),inset_0_0_95px_rgba(0,0,0,0.72)]" />
 
             <nav
@@ -250,16 +247,14 @@ export default function HeroMenu({
           handleScrollEdge();
         }}
         aria-label={isAtTop ? "Вниз" : "Наверх"}
-        className={`fixed bottom-6 right-5 z-[170] flex h-[50px] w-[50px] items-center justify-center rounded-full border border-[#f4d27a]/45 bg-[#070604]/90 text-[#ffe38b] shadow-[0_0_38px_rgba(244,210,122,0.28),inset_0_0_24px_rgba(244,210,122,0.08)] backdrop-blur-md transition-all duration-300 hover:border-[#f4d27a]/70 hover:text-[#f4d27a] hover:shadow-[0_0_52px_rgba(244,210,122,0.42),inset_0_0_26px_rgba(244,210,122,0.12)] md:bottom-8 md:right-8 ${
+        className={`review-modal-hide-control fixed bottom-6 right-5 z-[170] flex h-[50px] w-[50px] items-center justify-center rounded-full border border-[#f4d27a]/45 bg-[#070604]/90 text-[#ffe38b] shadow-[0_0_38px_rgba(244,210,122,0.28),inset_0_0_24px_rgba(244,210,122,0.08)] backdrop-blur-md transition-all duration-300 hover:border-[#f4d27a]/70 hover:text-[#f4d27a] hover:shadow-[0_0_52px_rgba(244,210,122,0.42),inset_0_0_26px_rgba(244,210,122,0.12)] md:bottom-8 md:right-8 ${
           menuOpen
             ? "pointer-events-none opacity-0 md:pointer-events-auto md:opacity-100"
             : "pointer-events-auto opacity-100"
         }`}
       >
         <span className="pointer-events-none absolute inset-[-6px] rounded-full border border-[#f4d27a]/24" />
-
         <span className="pointer-events-none absolute inset-[6px] rounded-full border border-[#f4d27a]/10" />
-
         <span className="pointer-events-none absolute -right-1 bottom-1 h-5 w-5 rounded-full bg-[#f4d27a]/55 blur-md" />
 
         <svg

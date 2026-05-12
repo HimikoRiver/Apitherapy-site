@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Star } from "lucide-react";
 
 function makePreview(text, max) {
   if (text.length <= max) return text;
@@ -13,9 +13,18 @@ function makePreview(text, max) {
   return `${sliced.slice(0, lastSpace)}...`;
 }
 
+function getSafeRating(rating) {
+  const value = Number(rating);
+
+  if (!Number.isInteger(value)) return 5;
+
+  return Math.max(1, Math.min(value, 5));
+}
+
 export default function ReviewCard({ review, previewMax, onSelectReview }) {
   const previewText = makePreview(review.text, previewMax);
   const isLong = review.text.length > previewMax;
+  const rating = getSafeRating(review.rating);
 
   return (
     <article className="group relative flex h-full min-h-[250px] flex-col overflow-hidden rounded-[22px] border border-amber-300/20 bg-[#140e0a]/90 p-4 backdrop-blur-md transition-all duration-500 hover:-translate-y-[3px] hover:border-amber-300/40 md:min-h-[270px] md:p-5">
@@ -28,10 +37,28 @@ export default function ReviewCard({ review, previewMax, onSelectReview }) {
           <h3 className="mt-3 break-words text-[14px] font-semibold text-white md:text-[15px]">
             {review.author}
           </h3>
+
+          <div
+            className="mt-2 flex items-center gap-1 text-amber-200"
+            aria-label={`Оценка ${rating} из 5`}
+          >
+            {[1, 2, 3, 4, 5].map((star) => {
+              const active = star <= rating;
+
+              return (
+                <Star
+                  key={star}
+                  size={14}
+                  fill={active ? "currentColor" : "none"}
+                  className={active ? "text-amber-200" : "text-white/24"}
+                />
+              );
+            })}
+          </div>
         </div>
 
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-amber-300/20 bg-[#2a1b0a]/90 text-xs text-amber-200">
-          ✦
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-amber-300/20 bg-[#2a1b0a]/90 text-xs font-semibold text-amber-200">
+          {rating}.0
         </div>
       </div>
 

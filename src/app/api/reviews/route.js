@@ -4,6 +4,18 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
+const REVIEW_CATEGORIES = [
+  "Общее",
+  "Грыжа",
+  "Варикоз",
+  "Неврит лицевого нерва",
+  "Воспаление седалищного нерва",
+  "Невралгия тройничного нерва",
+  "Артрит / артроз",
+  "Рассеянный склероз",
+  "Болезнь Паркинсона",
+];
+
 const supabase =
   supabaseUrl && supabaseServiceRoleKey
     ? createClient(supabaseUrl, supabaseServiceRoleKey)
@@ -17,6 +29,10 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+function isValidCategory(category) {
+  return REVIEW_CATEGORIES.includes(category);
+}
+
 export async function GET() {
   if (!supabase) {
     return NextResponse.json(
@@ -27,7 +43,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from("reviews")
-    .select("id, author_name, rating, text, created_at, is_featured")
+    .select("id, author_name, rating, text, category, created_at, is_featured")
     .eq("status", "approved")
     .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false });
@@ -64,6 +80,7 @@ export async function POST(request) {
   const authorName = normalizeText(body.authorName);
   const email = normalizeText(body.email).toLowerCase();
   const text = normalizeText(body.text);
+  const category = normalizeText(body.category) || "Общее";
   const rating = Number(body.rating);
 
   if (authorName.length < 2 || authorName.length > 80) {
@@ -87,6 +104,13 @@ export async function POST(request) {
     );
   }
 
+  if (!isValidCategory(category)) {
+    return NextResponse.json(
+      { message: "Выберите корректную категорию отзыва." },
+      { status: 400 }
+    );
+  }
+
   if (text.length < 10 || text.length > 1200) {
     return NextResponse.json(
       { message: "Отзыв должен быть от 10 до 1200 символов." },
@@ -99,6 +123,7 @@ export async function POST(request) {
     email,
     rating,
     text,
+    category,
     status: "pending",
     source: "site",
   });

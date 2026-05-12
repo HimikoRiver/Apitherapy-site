@@ -11,6 +11,30 @@ const PREVIEW_MAX_MOBILE = 150;
 const PREVIEW_MAX_DESKTOP = 185;
 const SWIPE_THRESHOLD = 50;
 
+const SLIDER_LAYOUTS = {
+  mobile: {
+    slideSize: 1,
+    previewMax: PREVIEW_MAX_MOBILE,
+    pageGridClass: "grid-cols-1 gap-4",
+    isMobile: true,
+    isTouchSlider: true,
+  },
+  tablet: {
+    slideSize: 4,
+    previewMax: PREVIEW_MAX_DESKTOP,
+    pageGridClass: "grid-cols-2 gap-4",
+    isMobile: false,
+    isTouchSlider: true,
+  },
+  desktop: {
+    slideSize: 6,
+    previewMax: PREVIEW_MAX_DESKTOP,
+    pageGridClass: "grid-cols-3 gap-4",
+    isMobile: false,
+    isTouchSlider: false,
+  },
+};
+
 function clampPage(page, totalPages) {
   return Math.max(0, Math.min(page, totalPages - 1));
 }
@@ -25,10 +49,18 @@ function chunkArray(arr, size) {
   return chunks;
 }
 
-function getSlideSize(width) {
-  if (width < 768) return 1;
-  if (width < 1280) return 4;
-  return 6;
+function getSliderMode() {
+  if (typeof window === "undefined") return "mobile";
+
+  if (window.matchMedia("(min-width: 1280px)").matches) {
+    return "desktop";
+  }
+
+  if (window.matchMedia("(min-width: 768px)").matches) {
+    return "tablet";
+  }
+
+  return "mobile";
 }
 
 export default function ReviewsSlider({
@@ -36,36 +68,41 @@ export default function ReviewsSlider({
   activeCategory,
   onSelectReview,
 }) {
+  const [sliderMode, setSliderMode] = useState("mobile");
   const [pageState, setPageState] = useState({ key: "", page: 0 });
-  const [viewportWidth, setViewportWidth] = useState(1440);
 
   const touchStartX = useRef(null);
   const touchEndX = useRef(null);
 
   useEffect(() => {
-    const updateWidth = () => setViewportWidth(window.innerWidth);
+    const desktopQuery = window.matchMedia("(min-width: 1280px)");
+    const tabletQuery = window.matchMedia("(min-width: 768px)");
 
-    updateWidth();
-    window.addEventListener("resize", updateWidth);
+    const updateSliderMode = () => {
+      setSliderMode(getSliderMode());
+    };
 
-    return () => window.removeEventListener("resize", updateWidth);
+    updateSliderMode();
+
+    desktopQuery.addEventListener("change", updateSliderMode);
+    tabletQuery.addEventListener("change", updateSliderMode);
+
+    return () => {
+      desktopQuery.removeEventListener("change", updateSliderMode);
+      tabletQuery.removeEventListener("change", updateSliderMode);
+    };
   }, []);
 
-  const slideSize = useMemo(
-    () => getSlideSize(viewportWidth),
-    [viewportWidth]
-  );
-
-  const previewMax =
-    viewportWidth < 768 ? PREVIEW_MAX_MOBILE : PREVIEW_MAX_DESKTOP;
+  const { slideSize, previewMax, pageGridClass, isMobile, isTouchSlider } =
+    SLIDER_LAYOUTS[sliderMode];
 
   const pages = useMemo(() => {
     return chunkArray(reviews, slideSize);
   }, [reviews, slideSize]);
 
   const totalPages = pages.length || 1;
-  const isTouchSlider = viewportWidth < 1280;
-  const pageResetKey = `${activeCategory}-${slideSize}`;
+  const pageResetKey = `${activeCategory}-${sliderMode}`;
+
   const activePage =
     pageState.key === pageResetKey
       ? clampPage(pageState.page, totalPages)
@@ -78,6 +115,7 @@ export default function ReviewsSlider({
           previousState.key === pageResetKey
             ? clampPage(previousState.page, totalPages)
             : 0;
+
         const resolvedPage =
           typeof nextPage === "function" ? nextPage(currentPage) : nextPage;
 
@@ -100,13 +138,13 @@ export default function ReviewsSlider({
     return () => clearInterval(interval);
   }, [setActivePage, totalPages]);
 
-  const goPrev = () => {
+  const goPrev = useCallback(() => {
     setActivePage((prev) => (prev - 1 + totalPages) % totalPages);
-  };
+  }, [setActivePage, totalPages]);
 
-  const goNext = () => {
+  const goNext = useCallback(() => {
     setActivePage((prev) => (prev + 1) % totalPages);
-  };
+  }, [setActivePage, totalPages]);
 
   const handleTouchStart = (e) => {
     touchStartX.current = e.touches[0].clientX;
@@ -134,7 +172,7 @@ export default function ReviewsSlider({
   return (
     <div className="relative">
       <div
-        className="overflow-hidden"
+        className="overflow-hidden touch-pan-y"
         onTouchStart={isTouchSlider ? handleTouchStart : undefined}
         onTouchMove={isTouchSlider ? handleTouchMove : undefined}
         onTouchEnd={isTouchSlider ? handleTouchEnd : undefined}
@@ -147,7 +185,7 @@ export default function ReviewsSlider({
           {pages.map((page, pageIndex) => (
             <div
               key={pageIndex}
-              className="grid min-w-full grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
+              className={`grid min-w-full auto-rows-fr ${pageGridClass}`}
             >
               {page.map((review) => (
                 <ReviewCard
@@ -165,7 +203,7 @@ export default function ReviewsSlider({
       <SliderPagination
         totalPages={totalPages}
         activePage={activePage}
-        isMobile={viewportWidth < 768}
+        isMobile={isMobile}
         onChange={setActivePage}
       />
     </div>

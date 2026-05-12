@@ -1,18 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Loader2, Send, Star, X } from "lucide-react";
+
+const REVIEW_CATEGORIES = [
+  "Общее",
+  "Грыжа",
+  "Варикоз",
+  "Неврит лицевого нерва",
+  "Воспаление седалищного нерва",
+  "Невралгия тройничного нерва",
+  "Артрит / артроз",
+  "Рассеянный склероз",
+  "Болезнь Паркинсона",
+];
 
 const INITIAL_FORM = {
   authorName: "",
   email: "",
+  category: "Общее",
   rating: 5,
   text: "",
 };
 
 export default function ReviewFormModal({ open, onClose, onSuccess }) {
   const shouldReduceMotion = useReducedMotion();
+  const scrollYRef = useRef(0);
 
   const [form, setForm] = useState(INITIAL_FORM);
   const [status, setStatus] = useState("idle");
@@ -23,16 +37,49 @@ export default function ReviewFormModal({ open, onClose, onSuccess }) {
   useEffect(() => {
     if (!open) return;
 
-    const previousOverflow = document.body.style.overflow;
-    const previousPaddingRight = document.body.style.paddingRight;
-    const scrollbarWidth =
-      window.innerWidth - document.documentElement.clientWidth;
+    scrollYRef.current = window.scrollY;
 
-    document.body.style.overflow = "hidden";
+    const html = document.documentElement;
+    const body = document.body;
 
-    if (scrollbarWidth > 0) {
-      document.body.style.paddingRight = `${scrollbarWidth}px`;
-    }
+    const previousHtmlOverflowY = html.style.overflowY;
+    const previousHtmlScrollbarGutter = html.style.scrollbarGutter;
+    const previousBodyOverflow = body.style.overflow;
+    const previousBodyPosition = body.style.position;
+    const previousBodyTop = body.style.top;
+    const previousBodyLeft = body.style.left;
+    const previousBodyRight = body.style.right;
+    const previousBodyWidth = body.style.width;
+
+    body.classList.add("review-form-modal-open");
+
+    html.style.overflowY = "scroll";
+    html.style.scrollbarGutter = "stable";
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollYRef.current}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
+
+    return () => {
+      body.classList.remove("review-form-modal-open");
+
+      html.style.overflowY = previousHtmlOverflowY;
+      html.style.scrollbarGutter = previousHtmlScrollbarGutter;
+      body.style.overflow = previousBodyOverflow;
+      body.style.position = previousBodyPosition;
+      body.style.top = previousBodyTop;
+      body.style.left = previousBodyLeft;
+      body.style.right = previousBodyRight;
+      body.style.width = previousBodyWidth;
+
+      window.scrollTo(0, scrollYRef.current);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
 
     const handleKeyDown = (event) => {
       if (event.key === "Escape" && !isSubmitting) {
@@ -43,8 +90,6 @@ export default function ReviewFormModal({ open, onClose, onSuccess }) {
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = previousOverflow;
-      document.body.style.paddingRight = previousPaddingRight;
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [open, isSubmitting, onClose]);
@@ -104,11 +149,10 @@ export default function ReviewFormModal({ open, onClose, onSuccess }) {
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[130] flex items-center justify-center bg-black/64 px-4 py-4 backdrop-blur-[5px] md:px-5 md:py-6"
+          className="fixed inset-0 z-[300] flex items-center justify-center overflow-hidden overscroll-none bg-black/64 px-4 py-4 backdrop-blur-[5px] md:px-5 md:py-6"
           initial={shouldReduceMotion ? false : { opacity: 0 }}
           animate={shouldReduceMotion ? {} : { opacity: 1 }}
           exit={shouldReduceMotion ? {} : { opacity: 0 }}
-          onClick={isSubmitting ? undefined : onClose}
           role="dialog"
           aria-modal="true"
           aria-labelledby="review-form-title"
@@ -193,6 +237,31 @@ export default function ReviewFormModal({ open, onClose, onSuccess }) {
                   </label>
                 </div>
 
+                <label className="block">
+                  <span className="mb-2 block text-xs uppercase tracking-[0.16em] text-amber-100/80">
+                    Категория
+                  </span>
+                  <select
+                    value={form.category}
+                    onChange={(event) =>
+                      updateField("category", event.target.value)
+                    }
+                    disabled={isSubmitting}
+                    className="w-full rounded-2xl border border-amber-300/16 bg-black/22 px-4 py-3 text-sm text-white outline-none transition-all duration-300 focus:border-amber-300/42 disabled:opacity-60"
+                    required
+                  >
+                    {REVIEW_CATEGORIES.map((category) => (
+                      <option
+                        key={category}
+                        value={category}
+                        className="bg-[#130d08] text-white"
+                      >
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
                 <div>
                   <span className="mb-2 block text-xs uppercase tracking-[0.16em] text-amber-100/80">
                     Оценка
@@ -235,7 +304,7 @@ export default function ReviewFormModal({ open, onClose, onSuccess }) {
                     disabled={isSubmitting}
                     placeholder="Напишите ваш отзыв..."
                     rows={6}
-                    className="min-h-[150px] w-full resize-y rounded-2xl border border-amber-300/16 bg-black/22 px-4 py-3 text-sm leading-6 text-white outline-none transition-all duration-300 placeholder:text-white/32 focus:border-amber-300/42 disabled:opacity-60"
+                    className="min-h-[150px] w-full resize-none rounded-2xl border border-amber-300/16 bg-black/22 px-4 py-3 text-sm leading-6 text-white outline-none transition-all duration-300 placeholder:text-white/32 focus:border-amber-300/42 disabled:opacity-60"
                     required
                   />
                 </label>

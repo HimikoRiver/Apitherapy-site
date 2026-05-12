@@ -16,7 +16,7 @@ function normalizeSiteReview(review) {
   return {
     id: `site-${review.id}`,
     author: review.author_name || "Пациент",
-    category: "Отзывы с сайта",
+    category: review.category || "Общее",
     text: review.text || "",
     rating: review.rating || 5,
     createdAt: review.created_at || null,
@@ -59,26 +59,42 @@ export default function ReviewsSection() {
     return () => controller.abort();
   }, [loadSiteReviews]);
 
-  const categories = useMemo(() => {
-    if (!siteReviews.length) return reviewCategories;
-
-    return [
-      "Все",
-      "Отзывы с сайта",
-      ...reviewCategories.filter(
-        (category) => category !== "Все" && category !== "Отзывы с сайта"
-      ),
-    ];
-  }, [siteReviews.length]);
-
   const allReviews = useMemo(() => {
     return [...siteReviews, ...reviewsData];
   }, [siteReviews]);
 
+  const categories = useMemo(() => {
+    const existingCategories = new Set(reviewCategories);
+
+    allReviews.forEach((review) => {
+      if (review.category && review.category !== "Все") {
+        existingCategories.add(review.category);
+      }
+    });
+
+    return [
+      "Все",
+      ...Array.from(existingCategories).filter(
+        (category) => category !== "Все" && category !== "Отзывы с сайта"
+      ),
+    ];
+  }, [allReviews]);
+
   const filteredReviews = useMemo(() => {
     if (activeCategory === "Все") return allReviews;
+
     return allReviews.filter((review) => review.category === activeCategory);
   }, [activeCategory, allReviews]);
+
+  useEffect(() => {
+    if (activeCategory === "Все") return;
+
+    const categoryExists = categories.includes(activeCategory);
+
+    if (!categoryExists) {
+      setActiveCategory("Все");
+    }
+  }, [activeCategory, categories]);
 
   useEffect(() => {
     if (!selectedReview) return;
@@ -170,6 +186,7 @@ export default function ReviewsSection() {
       <ReviewFormModal
         open={reviewFormOpen}
         onClose={() => setReviewFormOpen(false)}
+        onSuccess={() => loadSiteReviews()}
       />
     </section>
   );

@@ -19,21 +19,75 @@
   }
 }
 
+html {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(251, 191, 36, 0.72) #08080b;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(251, 191, 36, 0.72) #08080b;
 }
 
+body.review-form-modal-open .review-modal-hide-control {
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
 
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: linear-gradient(180deg, #08080b 0%, #130d08 100%);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb {
+  min-height: 54px;
+  border: 2px solid #08080b;
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    rgba(251, 191, 36, 0.9) 0%,
+    rgba(217, 119, 6, 0.82) 48%,
+    rgba(92, 45, 12, 0.88) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 0 16px rgba(251, 191, 36, 0.2);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(253, 224, 71, 0.96) 0%,
+    rgba(245, 158, 11, 0.9) 45%,
+    rgba(146, 64, 14, 0.92) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    0 0 20px rgba(251, 191, 36, 0.32);
+}
+
+*::-webkit-scrollbar-corner {
+  background: #08080b;
+}
 
 @keyframes floatGlowOne {
   0% {
     transform: translate3d(-8%, -4%, 0) scale(1);
   }
+
   50% {
     transform: translate3d(10%, 6%, 0) scale(1.12);
   }
+
   100% {
     transform: translate3d(-8%, -4%, 0) scale(1);
   }
@@ -43,9 +97,11 @@ body {
   0% {
     transform: translate3d(10%, 8%, 0) scale(1.05);
   }
+
   50% {
     transform: translate3d(-12%, -6%, 0) scale(1.18);
   }
+
   100% {
     transform: translate3d(10%, 8%, 0) scale(1.05);
   }
@@ -60,22 +116,24 @@ body {
 }
 
 .honey-glow-1 {
-  background:
-    radial-gradient(circle at 50% 45%,
-      rgba(255, 205, 90, 0.24) 0%,
-      rgba(255, 145, 20, 0.18) 24%,
-      rgba(140, 45, 0, 0.08) 42%,
-      transparent 64%);
+  background: radial-gradient(
+    circle at 50% 45%,
+    rgba(255, 205, 90, 0.24) 0%,
+    rgba(255, 145, 20, 0.18) 24%,
+    rgba(140, 45, 0, 0.08) 42%,
+    transparent 64%
+  );
   animation: floatGlowOne 14s ease-in-out infinite;
 }
 
 .honey-glow-2 {
-  background:
-    radial-gradient(circle at 55% 50%,
-      rgba(255, 180, 60, 0.18) 0%,
-      rgba(255, 110, 0, 0.12) 28%,
-      rgba(90, 20, 0, 0.06) 46%,
-      transparent 68%);
+  background: radial-gradient(
+    circle at 55% 50%,
+    rgba(255, 180, 60, 0.18) 0%,
+    rgba(255, 110, 0, 0.12) 28%,
+    rgba(90, 20, 0, 0.06) 46%,
+    transparent 68%
+  );
   animation: floatGlowTwo 18s ease-in-out infinite;
 }
 
@@ -83,14 +141,13 @@ body {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background:
-    radial-gradient(circle at center, transparent 38%, rgba(0, 0, 0, 0.22) 72%, rgba(0, 0, 0, 0.78) 100%);
+  background: radial-gradient(
+    circle at center,
+    transparent 38%,
+    rgba(0, 0, 0, 0.22) 72%,
+    rgba(0, 0, 0, 0.78) 100%
+  );
 }
-
-
-
-
-
 
 .bee-container {
   position: absolute;
@@ -114,8 +171,6 @@ body {
   user-select: none;
   pointer-events: none;
 }
-
-/* стартовые позиции */
 
 .bee-a {
   top: 10%;
@@ -141,8 +196,6 @@ body {
   animation: beeFlightD 13s infinite ease-in-out;
 }
 
-/* плавное "жужжание" */
-
 .bee-a .bee-image,
 .bee-b .bee-image,
 .bee-c .bee-image,
@@ -150,21 +203,23 @@ body {
   animation: beeFloat 0.9s infinite ease-in-out;
 }
 
-/* траектории */
-
 @keyframes beeFlightA {
   0% {
     transform: translate(0, 0) rotate(0deg);
   }
+
   20% {
     transform: translate(80px, -36px) rotate(6deg);
   }
+
   45% {
     transform: translate(150px, 12px) rotate(-4deg);
   }
+
   70% {
     transform: translate(92px, 78px) rotate(5deg);
   }
+
   100% {
     transform: translate(0, 0) rotate(0deg);
   }
@@ -174,15 +229,19 @@ body {
   0% {
     transform: translate(0, 0) rotate(0deg);
   }
+
   25% {
     transform: translate(-90px, 48px) rotate(-7deg);
   }
+
   50% {
     transform: translate(-168px, -24px) rotate(5deg);
   }
+
   75% {
     transform: translate(-58px, -72px) rotate(-4deg);
   }
+
   100% {
     transform: translate(0, 0) rotate(0deg);
   }
@@ -192,15 +251,19 @@ body {
   0% {
     transform: translate(0, 0) rotate(0deg);
   }
+
   25% {
     transform: translate(74px, -82px) rotate(7deg);
   }
+
   50% {
     transform: translate(158px, -18px) rotate(-5deg);
   }
+
   75% {
     transform: translate(64px, 52px) rotate(4deg);
   }
+
   100% {
     transform: translate(0, 0) rotate(0deg);
   }
@@ -210,15 +273,19 @@ body {
   0% {
     transform: translate(0, 0) rotate(0deg);
   }
+
   20% {
     transform: translate(-72px, -28px) rotate(-5deg);
   }
+
   50% {
     transform: translate(-146px, 42px) rotate(6deg);
   }
+
   80% {
     transform: translate(-48px, 68px) rotate(-3deg);
   }
+
   100% {
     transform: translate(0, 0) rotate(0deg);
   }
@@ -228,16 +295,54 @@ body {
   0% {
     transform: translateY(0) scale(1);
   }
+
   25% {
     transform: translateY(-2px) scale(1.02);
   }
+
   50% {
     transform: translateY(0) scale(1);
   }
+
   75% {
     transform: translateY(2px) scale(0.99);
   }
+
   100% {
     transform: translateY(0) scale(1);
   }
+}
+
+@keyframes goldTextFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.gold-text-flow {
+  display: inline-block;
+  background-image: linear-gradient(
+    110deg,
+    #9f5f1f 0%,
+    #c7892f 18%,
+    #e0ad4f 36%,
+    #b87522 54%,
+    #d6a84f 72%,
+    #8f4f18 100%
+  );
+  background-size: 320% 320%;
+  background-position: 0% 50%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  animation: goldTextFlow 5.5s ease-in-out infinite;
 }
