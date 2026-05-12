@@ -10,14 +10,60 @@ import ReviewModal from "@/components/ReviewModal";
 import ReviewsSlider from "@/components/ReviewsSlider";
 import { reviewCategories, reviewsData } from "@/data/reviewsData";
 
+function normalizeSiteReview(review) {
+  return {
+    id: `site-${review.id}`,
+    author: review.author_name || "Пациент",
+    category: "Отзывы с сайта",
+    text: review.text || "",
+    rating: review.rating || 5,
+    createdAt: review.created_at || null,
+    isFeatured: Boolean(review.is_featured),
+  };
+}
+
 export default function ReviewsSection() {
   const [activeCategory, setActiveCategory] = useState("Все");
   const [selectedReview, setSelectedReview] = useState(null);
+  const [siteReviews, setSiteReviews] = useState([]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadSiteReviews() {
+      try {
+        const response = await fetch("/api/reviews", {
+          signal: controller.signal,
+          cache: "no-store",
+        });
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+
+        if (Array.isArray(data?.reviews)) {
+          setSiteReviews(data.reviews.map(normalizeSiteReview));
+        }
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          setSiteReviews([]);
+        }
+      }
+    }
+
+    loadSiteReviews();
+
+    return () => controller.abort();
+  }, []);
+
+  const allReviews = useMemo(() => {
+    return [...siteReviews, ...reviewsData];
+  }, [siteReviews]);
 
   const filteredReviews = useMemo(() => {
-    if (activeCategory === "Все") return reviewsData;
-    return reviewsData.filter((review) => review.category === activeCategory);
-  }, [activeCategory]);
+    if (activeCategory === "Все") return allReviews;
+    return allReviews.filter((review) => review.category === activeCategory);
+  }, [activeCategory, allReviews]);
 
   useEffect(() => {
     if (!selectedReview) return;
