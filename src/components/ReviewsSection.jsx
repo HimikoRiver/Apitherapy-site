@@ -1,12 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { MessageSquareHeart } from "lucide-react";
 
 import HoneycombGridCanvas from "@/components/HoneycombGridCanvas";
 import ReviewsFiltersBlock from "@/components/ReviewsFiltersBlock";
 import ReviewModal from "@/components/ReviewModal";
+import ReviewFormModal from "@/components/ReviewFormModal";
 import ReviewsSlider from "@/components/ReviewsSlider";
 import { reviewCategories, reviewsData } from "@/data/reviewsData";
 
@@ -26,35 +28,48 @@ export default function ReviewsSection() {
   const [activeCategory, setActiveCategory] = useState("Все");
   const [selectedReview, setSelectedReview] = useState(null);
   const [siteReviews, setSiteReviews] = useState([]);
+  const [reviewFormOpen, setReviewFormOpen] = useState(false);
+
+  const loadSiteReviews = useCallback(async (signal) => {
+    try {
+      const response = await fetch("/api/reviews", {
+        signal,
+        cache: "no-store",
+      });
+
+      if (!response.ok) return;
+
+      const data = await response.json();
+
+      if (Array.isArray(data?.reviews)) {
+        setSiteReviews(data.reviews.map(normalizeSiteReview));
+      }
+    } catch (error) {
+      if (error.name !== "AbortError") {
+        setSiteReviews([]);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
 
-    async function loadSiteReviews() {
-      try {
-        const response = await fetch("/api/reviews", {
-          signal: controller.signal,
-          cache: "no-store",
-        });
-
-        if (!response.ok) return;
-
-        const data = await response.json();
-
-        if (Array.isArray(data?.reviews)) {
-          setSiteReviews(data.reviews.map(normalizeSiteReview));
-        }
-      } catch (error) {
-        if (error.name !== "AbortError") {
-          setSiteReviews([]);
-        }
-      }
-    }
-
-    loadSiteReviews();
+    loadSiteReviews(controller.signal);
 
     return () => controller.abort();
-  }, []);
+  }, [loadSiteReviews]);
+
+  const categories = useMemo(() => {
+    if (!siteReviews.length) return reviewCategories;
+
+    return [
+      "Все",
+      "Отзывы с сайта",
+      ...reviewCategories.filter(
+        (category) => category !== "Все" && category !== "Отзывы с сайта"
+      ),
+    ];
+  }, [siteReviews.length]);
 
   const allReviews = useMemo(() => {
     return [...siteReviews, ...reviewsData];
@@ -123,10 +138,19 @@ export default function ReviewsSection() {
               похожую ситуацию.
             </p>
           </div>
+
+          <button
+            type="button"
+            onClick={() => setReviewFormOpen(true)}
+            className="mt-5 inline-flex items-center gap-2 rounded-full border border-amber-300/28 bg-[#2c1c0a]/95 px-5 py-3 text-sm font-medium text-amber-100 shadow-[0_12px_34px_rgba(0,0,0,0.22)] transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-300/48 hover:bg-[#38230d]"
+          >
+            <MessageSquareHeart size={17} />
+            Оставить отзыв
+          </button>
         </div>
 
         <ReviewsFiltersBlock
-          categories={reviewCategories}
+          categories={categories}
           activeCategory={activeCategory}
           onChange={setActiveCategory}
         />
@@ -141,6 +165,11 @@ export default function ReviewsSection() {
       <ReviewModal
         selectedReview={selectedReview}
         onClose={() => setSelectedReview(null)}
+      />
+
+      <ReviewFormModal
+        open={reviewFormOpen}
+        onClose={() => setReviewFormOpen(false)}
       />
     </section>
   );
